@@ -10,9 +10,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  intl: ^0.18.0
 
 
   cupertino_icons: ^1.0.2
+  url_launcher: ^6.1.10
+  http: ^0.13.5
+  shared_preferences: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -30,11 +34,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/icons/coins.png
-    - assets/icons/pizzaBarIcon.png
-    - assets/icons/profileBarIcon.png
-    - assets/icons/cartBarIcon.png
-    - assets/icons/contactsBarIcon.png
+    - assets/icons/
 
   fonts:
     - family: Ubuntu

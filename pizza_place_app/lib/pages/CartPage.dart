@@ -11,7 +11,13 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      body: Container(
+        alignment: Alignment.center,
+        child: Visibility(
+          visible: true,
+          child: Image.asset('assets/icons/emptyCart.png')
+        ),
+      ),
     );
   }
 }

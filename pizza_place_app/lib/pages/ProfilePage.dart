@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pizza_place_app/classes/AppColor.dart';
+import 'package:pizza_place_app/models/User.dart';
+import 'package:pizza_place_app/utils/AppColor.dart';
+import 'package:pizza_place_app/utils/DbHandler.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -9,61 +11,102 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  List<User> users = [];
+
+  @override
+  void initState() {
+    super.initState();
+    DbHandler.fetchUsers().then((data) {
+      setState(() {
+        users = data;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
         children: [
           Container(
-            height: 80,
-            padding: EdgeInsets.only(left: 20, right: 20),
+            padding: EdgeInsets.all(32),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Hello, ?',
+                  'Доброе утро!',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Icon(Icons.settings, color: Colors.black),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    shadowColor: AppColor.pumpkin,
-                    fixedSize: const Size(60, 60),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(100)
-                    )
+                TextButton(
+                    onPressed: () {
+                      print(users[0].toString());
+                    },
+                    child: Text(
+                      'Сохранить',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16
+                      ),
+                    ),
+                  style: TextButton.styleFrom(
+                    backgroundColor: AppColor.notAvailable,
+                    padding: EdgeInsets.all(16)
                   )
                 )
-              ],
+              ]
             ),
           ),
+          SizedBox(height: 32),
           Container(
-            color: Colors.blue,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            padding: EdgeInsets.only(left: 32, right: 32, top: 16, bottom: 16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  color: Colors.red,
-                  padding: EdgeInsets.all(80),
-                ),
-                Column(
-                  children: [
-                    Container(
-                      height: 40,
-                      color: Colors.green,
-                      padding: EdgeInsets.all(80),
+                TextField(
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                      borderSide: const BorderSide(color: Colors.grey),
                     ),
-                    Container(
-                      height: 40,
-                      color: Colors.purple,
-                      padding: EdgeInsets.all(80),
+                    prefixIcon: Icon(Icons.accessibility),
+                    hintText: "Имя"
+                  )
+                ),
+                SizedBox(height: 24),
+                TextField(
+                    decoration: InputDecoration(
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        prefixIcon: Icon(Icons.phone),
+                        hintText: "Телефон"
                     )
-                  ],
+                ),
+                SizedBox(height: 24),
+                TextField(
+                    decoration: InputDecoration(
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        prefixIcon: Icon(Icons.email),
+                        hintText: "Почта"
+                    )
+                ),
+                SizedBox(height: 24),
+                TextField(
+                    decoration: InputDecoration(
+                        border: const OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        prefixIcon: Icon(Icons.date_range),
+                        hintText: "День рождения"
+                    )
                 )
               ],
             ),

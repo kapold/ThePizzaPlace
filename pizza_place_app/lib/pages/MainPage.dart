@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pizza_place_app/classes/AppColor.dart';
+import 'package:pizza_place_app/pages/OrdersPage.dart';
+import 'package:pizza_place_app/utils/AppColor.dart';
 import 'package:pizza_place_app/pages/CartPage.dart';
-import 'package:pizza_place_app/pages/ContactsPage.dart';
 import 'package:pizza_place_app/pages/MenuPage.dart';
 import 'package:pizza_place_app/pages/ProfilePage.dart';
 
@@ -17,7 +17,7 @@ class _MainPageState extends State<MainPage> {
   final List<Widget> _children = [
     MenuPage(),
     ProfilePage(),
-    ContactsPage(),
+    OrdersPage(),
     CartPage()
   ];
 
@@ -48,8 +48,8 @@ class _MainPageState extends State<MainPage> {
               label: 'Профиль'
           ),
           BottomNavigationBarItem(
-              icon: ImageIcon(AssetImage('assets/icons/contactsBarIcon.png')),
-              label: 'Контакты'
+              icon: ImageIcon(AssetImage('assets/icons/orders.png')),
+              label: 'Заказы'
           ),
           BottomNavigationBarItem(
               icon: ImageIcon(AssetImage('assets/icons/cartBarIcon.png')),

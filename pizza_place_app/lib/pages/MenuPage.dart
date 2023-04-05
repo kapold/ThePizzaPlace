@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:pizza_place_app/classes/AppColor.dart';
-import 'package:pizza_place_app/classes/CustomSearchDelegate.dart';
+import 'package:intl/intl.dart';
+import 'package:pizza_place_app/utils/AppColor.dart';
+import 'package:pizza_place_app/utils/CustomSearchDelegate.dart';
 
 class MenuPage extends StatefulWidget {
   const MenuPage({Key? key}) : super(key: key);
@@ -10,6 +12,34 @@ class MenuPage extends StatefulWidget {
 }
 
 class _MenuPageState extends State<MenuPage> {
+  late String _timeString;
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timeString = _formatDateTime(DateTime.now());
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer t) => _getCurrentTime());
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return DateFormat('hh:mm:ss a').format(dateTime);
+  }
+
+  void _getCurrentTime() {
+    if (mounted) {
+      setState(() {
+        _timeString = _formatDateTime(DateTime.now());
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,18 +56,19 @@ class _MenuPageState extends State<MenuPage> {
                   child: Row(
                     children: [
                       Text(
-                        '8888',
+                        _timeString,
                         style: TextStyle(color: Colors.black),
                       ),
                       Padding(padding: EdgeInsets.only(left: 10)),
-                      Image.asset("assets/icons/coins.png", width: 16, height: 16)
+                      Image.asset("assets/icons/clock.png", width: 16, height: 16)
                     ],
                   ),
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColor.pumpkin
+                      backgroundColor: AppColor.pumpkin,
                   ),
                 ),
+                Padding(padding: EdgeInsets.only(left: 16)),
                 IconButton(
                   onPressed: () {
                     showSearch(
@@ -46,24 +77,9 @@ class _MenuPageState extends State<MenuPage> {
                     );
                   },
                   icon: const Icon(Icons.search),
-                )
+                ),
+                Padding(padding: EdgeInsets.only(left: 16))
               ],
-            ),
-          ),
-          Padding(padding: EdgeInsets.all(10)),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.grey
-            ),
-            height: 140,
-            width: 1000,
-            margin: EdgeInsets.fromLTRB(16, 0, 16, 0),
-            padding: EdgeInsets.fromLTRB(0, 16, 0, 16),
-            child: Column(
-                children: [
-                  // TODO: Switch
-                ]
             ),
           ),
           Padding(padding: EdgeInsets.all(10)),
