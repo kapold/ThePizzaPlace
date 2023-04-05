@@ -36,11 +36,26 @@ app.get('/users', async (req, res) => {
 app.post('/users', async (req, res) => {
     try {
         const { username, password, phoneNumber, birthday } = req.body;
-
-        res.status(201).json({ message: 'User added!' });
+        const result = await db.addUser(username, password, phoneNumber, birthday);
+        if (result) {
+            res.status(201).send('User added successfully');
+        } else {
+            res.status(500).send('Error adding user');
+        }
     } catch (error) {
         console.error(error);
-        res.status(500).send('Error fetching users');
+        res.status(500).send('Error adding user');
+    }
+});
+
+
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    const user = await db.getUserByUsernameAndPassword(username, password);
+    if (user) {
+        res.json(user.get_user_by_username_and_password);
+    } else {
+        res.status(401).json({ message: 'Invalid credentials' });
     }
 });
 

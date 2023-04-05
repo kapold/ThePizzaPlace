@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:pizza_place_app/utils/Utils.dart';
 import '../models/User.dart';
 
 class DbHandler {
@@ -16,7 +18,7 @@ class DbHandler {
     }
   }
 
-  static Future<void> addUser(User user) async {
+  static Future<void> addUser(User user, BuildContext context) async {
     final url = Uri.parse('http://localhost:3000/users');
     final headers = { 'Content-Type': 'application/json' };
     final body = json.encode({
@@ -25,9 +27,32 @@ class DbHandler {
       'phoneNumber': user.phoneNumber,
       'birthday': user.birthday
     });
+
     final response = await http.post(url, headers: headers, body: body);
     if (response.statusCode != 201) {
-      throw Exception('Failed to add User.');
+      if (response.statusCode == 500) {
+        Utils.showAlertDialog(context, "Такое имя уже занято, выберите другое.");
+        return;
+      }
+      Utils.showAlertDialog(context, "Failed to add User.");
     }
   }
+
+  static Future<User?> login(String username, String password) async {
+    final url = Uri.parse('http://localhost:3000/login');
+    final headers = { 'Content-Type': 'application/json' };
+    final body = json.encode({
+      'username': username,
+      'password': password,
+    });
+
+    final response = await http.post(url, headers: headers, body: body);
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      return User.fromJson(jsonResponse);
+    } else {
+      return null;
+    }
+  }
+
 }

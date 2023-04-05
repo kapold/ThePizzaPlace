@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_place_app/models/User.dart';
+import 'package:pizza_place_app/utils/DbHandler.dart';
 
 import '../utils/AppColor.dart';
 import '../utils/Utils.dart';
@@ -21,13 +23,14 @@ class _RegisterPageState extends State<RegisterPage> {
       Utils.showAlertDialog(context, "Заполните все поля!");
       return false;
     }
-
+    if (username.length < 4 || password.length < 8) {
+      Utils.showAlertDialog(context, "Проверьте данные: имя не менее 4 символов, пароль не менее 8 символов!");
+      return false;
+    }
     if (password != repeatPassword) {
       Utils.showAlertDialog(context, "Пароли не совпадают!");
       return false;
     }
-
-    Utils.showAlertDialog(context, "${username}, ${password}, ${repeatPassword}");
     return true;
   }
 
@@ -62,6 +65,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(height: 48),
                   TextField(
                       controller: usernameCtrl,
+                      maxLength: 16,
                       decoration: InputDecoration(
                           border: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(20.0)),
@@ -74,7 +78,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           hintText: "Имя пользователя"
                       )
                   ),
-                  SizedBox(height: 32),
+                  SizedBox(height: 12),
                   TextField(
                       controller: passwordCtrl,
                       obscureText: true,
@@ -109,7 +113,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   SizedBox(height: 64),
                   TextButton(
                       onPressed: () {
-                        checkCredentials();
+                        if (!checkCredentials())
+                          return;
+                        DbHandler.addUser(new User(username: username, password: password), context);
+                        Utils.showAlertDialog(context, "Успешно");
                       },
                       child: Text(
                         'Создать',
