@@ -112,11 +112,14 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   SizedBox(height: 64),
                   TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         if (!checkCredentials())
                           return;
-                        DbHandler.addUser(new User(username: username, password: password), context);
-                        Utils.showAlertDialog(context, "Успешно");
+                        bool result = await DbHandler.addUser(new User(username: username, password: password), context);
+                        if (result) {
+                          Navigator.pushNamed(context, '/auth');
+                          Utils.showAlertDialog(context, "Успешно");
+                        }
                       },
                       child: Text(
                         'Создать',

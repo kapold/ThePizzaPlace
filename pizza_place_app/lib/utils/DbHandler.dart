@@ -18,7 +18,7 @@ class DbHandler {
     }
   }
 
-  static Future<void> addUser(User user, BuildContext context) async {
+  static Future<bool> addUser(User user, BuildContext context) async {
     final url = Uri.parse('http://localhost:3000/users');
     final headers = { 'Content-Type': 'application/json' };
     final body = json.encode({
@@ -32,13 +32,13 @@ class DbHandler {
     if (response.statusCode != 201) {
       if (response.statusCode == 500) {
         Utils.showAlertDialog(context, "Такое имя уже занято, выберите другое.");
-        return;
+        return false;
       }
-      Utils.showAlertDialog(context, "Failed to add User.");
     }
+    return true;
   }
 
-  static Future<User?> login(String username, String password) async {
+  static Future<User?> login(String username, String password, BuildContext context) async {
     final url = Uri.parse('http://localhost:3000/login');
     final headers = { 'Content-Type': 'application/json' };
     final body = json.encode({
@@ -46,13 +46,17 @@ class DbHandler {
       'password': password,
     });
 
-    final response = await http.post(url, headers: headers, body: body);
-    if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      return User.fromJson(jsonResponse);
-    } else {
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        return User.fromJson(jsonResponse);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      Utils.showAlertDialog(context, "Неверный логин или пароль");
       return null;
     }
   }
-
 }

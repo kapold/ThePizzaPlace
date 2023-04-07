@@ -88,7 +88,7 @@ class _MenuPageState extends State<MenuPage> {
             alignment: Alignment.centerLeft,
             child: Text(
               'Выгодно и вкусно',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)
             )
           ),
           Padding(padding: EdgeInsets.all(10)),

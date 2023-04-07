@@ -18,7 +18,7 @@ class User {
       id: json['id'],
       username: json['username'] ?? null,
       password: json['password'] ?? null,
-      phoneNumber: json['phoneNumber'] ?? null,
+      phoneNumber: json['phone_number'] ?? null,
       birthday: json['birthday'] != null ? DateTime.parse(json['birthday']) : null,
     );
   }

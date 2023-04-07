@@ -13,7 +13,7 @@ class DatabaseApi {
 
     async getUsers() {
         try {
-            const { rows } = await this.pool.query('SELECT * FROM get_users()');
+            const {rows} = await this.pool.query('SELECT * FROM get_users()');
             return rows;
         } catch (error) {
             console.error(error);
@@ -31,9 +31,11 @@ class DatabaseApi {
 
             await this.pool.query('COMMIT');
             console.log('Successfully added user to database');
+            return true;
         } catch (e) {
             console.error('Error adding user to database', e);
             await this.pool.query('ROLLBACK');
+            return false;
         }
     }
 

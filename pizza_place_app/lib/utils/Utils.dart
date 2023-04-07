@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pizza_place_app/utils/AppColor.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/User.dart';
 
 class Utils {
+  static User? currentUser = null;
+
   static AlertDialog showAlertDialog(BuildContext context, String message) {
     Widget okButton = TextButton(
       child: Text("OK", style: TextStyle(color: AppColor.pumpkin)),
@@ -25,5 +30,21 @@ class Utils {
       }
     );
     return alert;
+  }
+
+  static Future<void> saveUserInSP(String username, String password) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', username);
+    await prefs.setString('password', password);
+  }
+
+  static Future<String?> getUsernameFromSP() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('username');
+  }
+
+  static Future<String?> getPasswordFromSP() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('password');
   }
 }

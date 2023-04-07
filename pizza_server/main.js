@@ -11,10 +11,10 @@ app.use(bodyParser.json());
 app.get('/', (req, res) => {
     fs.readFile('hello.html', (err, data) => {
         if (err) {
-            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.writeHead(500, {'Content-Type': 'text/plain'});
             res.end('Error loading page');
         } else {
-            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.writeHead(200, {'Content-Type': 'text/html'});
             res.end(data);
         }
     });
@@ -35,12 +35,15 @@ app.get('/users', async (req, res) => {
 /* POST */
 app.post('/users', async (req, res) => {
     try {
-        const { username, password, phoneNumber, birthday } = req.body;
+        const {username, password, phoneNumber, birthday} = req.body;
         const result = await db.addUser(username, password, phoneNumber, birthday);
+
         if (result) {
             res.status(201).send('User added successfully');
+            console.log('User added successfully 201')
         } else {
             res.status(500).send('Error adding user');
+            console.log('Error adding user 500')
         }
     } catch (error) {
         console.error(error);
@@ -50,12 +53,12 @@ app.post('/users', async (req, res) => {
 
 
 app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+    const {username, password} = req.body;
     const user = await db.getUserByUsernameAndPassword(username, password);
     if (user) {
         res.json(user.get_user_by_username_and_password);
     } else {
-        res.status(401).json({ message: 'Invalid credentials' });
+        res.status(401).json({message: 'Invalid credentials'});
     }
 });
 

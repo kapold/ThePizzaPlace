@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_place_app/pages/MainPage.dart';
 import 'package:pizza_place_app/utils/DbHandler.dart';
 import 'package:pizza_place_app/utils/Utils.dart';
 
@@ -79,13 +80,13 @@ class _AuthPageState extends State<AuthPage> {
                   SizedBox(height: 64),
                   TextButton(
                       onPressed: () async {
-                        Future<User?> user = DbHandler.login(username, password);
+                        Future<User?> user = DbHandler.login(username, password, context);
                         User? userData = await user;
 
                         if (userData != null) {
                           Utils.showAlertDialog(context, userData.toString());
-                        } else {
-                          Utils.showAlertDialog(context, "Такого пользователя нет(или ошибка в коде ._.)");
+                          Utils.saveUserInSP(username, password);
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));
                         }
                       },
                       child: Text(
