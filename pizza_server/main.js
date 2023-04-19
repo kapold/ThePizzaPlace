@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const DatabaseApi = require('./DatabaseApi');
@@ -35,8 +36,9 @@ app.get('/users', async (req, res) => {
 /* POST */
 app.post('/users', async (req, res) => {
     try {
-        const {username, password, phoneNumber, birthday} = req.body;
-        const result = await db.addUser(username, password, phoneNumber, birthday);
+        const {username, password, phone_number, birthday} = req.body;
+        const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+        const result = await db.addUser(username, passwordHash, phone_number, birthday);
 
         if (result) {
             res.status(201).send('User added successfully');
@@ -54,11 +56,31 @@ app.post('/users', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     const {username, password} = req.body;
-    const user = await db.getUserByUsernameAndPassword(username, password);
+    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+    const user = await db.getUserByUsernameAndPassword(username, passwordHash);
     if (user) {
         res.json(user.get_user_by_username_and_password);
     } else {
         res.status(401).json({message: 'Invalid credentials'});
+    }
+});
+
+/* PUT */
+app.put('/users', async (req, res) => {
+    try {
+        const {id, username, phone_number, birthday} = req.body;
+        const result = await db.updateUser(id, username, phone_number, birthday);
+
+        if (result) {
+            res.status(201).send('User updated successfully');
+            console.log('User updated successfully 201')
+        } else {
+            res.status(500).send('Error updating user');
+            console.log('Error updating user 500')
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error updating user');
     }
 });
 

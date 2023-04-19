@@ -39,6 +39,21 @@ class DatabaseApi {
         }
     }
 
+    async updateUser(id, username, phoneNumber, birthday) {
+        try {
+            const queryText = 'SELECT update_user($1, $2, $3, $4)';
+            const values = [id, username, phoneNumber, birthday];
+            await this.pool.query(queryText, values);
+
+            console.log('Successfully updated user to database');
+            return true;
+        } catch (e) {
+            console.error('Error updating user to database', e);
+            await this.pool.query('ROLLBACK');
+            return false;
+        }
+    }
+
     async getUserByUsernameAndPassword(username, password) {
         const query = {
             text: 'SELECT get_user_by_username_and_password($1, $2)',

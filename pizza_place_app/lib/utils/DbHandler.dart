@@ -24,7 +24,7 @@ class DbHandler {
     final body = json.encode({
       'username': user.username,
       'password': user.password,
-      'phoneNumber': user.phoneNumber,
+      'phone_number': user.phone_number,
       'birthday': user.birthday
     });
 
@@ -58,5 +58,25 @@ class DbHandler {
       Utils.showAlertDialog(context, "Неверный логин или пароль");
       return null;
     }
+  }
+
+  static Future<bool> updateUser(User user, BuildContext context) async {
+    final url = Uri.parse('http://localhost:3000/users');
+    final headers = { 'Content-Type': 'application/json' };
+    final body = json.encode({
+      'id': user.id,
+      'username': user.username,
+      'phone_number': user.phone_number,
+      'birthday': user.birthday
+    });
+
+    final response = await http.put(url, headers: headers, body: body);
+    if (response.statusCode != 201) {
+      if (response.statusCode == 500) {
+        Utils.showAlertDialog(context, "Проверьте правильность данных");
+        return false;
+      }
+    }
+    return true;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_place_app/pages/AddressesPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pizza_place_app/pages/AuthPage.dart';
 import 'package:pizza_place_app/pages/CartPage.dart';
@@ -34,7 +35,8 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => const ProfilePage(),
         '/orders': (context) => const OrdersPage(),
         '/cart': (context) => const CartPage(),
-        '/aboutApp': (context) => const AboutAppPage()
+        '/aboutApp': (context) => const AboutAppPage(),
+        '/addresses': (context) => const AddressesPage()
       },
       theme: ThemeData(
           fontFamily: 'Ubuntu',

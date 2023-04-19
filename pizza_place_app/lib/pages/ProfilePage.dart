@@ -27,12 +27,20 @@ class _ProfilePageState extends State<ProfilePage> {
     phoneNumberCtrl.addListener(updateTextValue);
     birthdayCtrl.addListener(updateTextValue);
     setState(() {
-      String u = Utils.currentUser!.username ?? "";
-      String p = Utils.currentUser!.phoneNumber ?? "";
-      String b = Utils.currentUser!.birthday != null ? Utils.currentUser!.birthday!.toString().substring(0, 10) : "";
-      usernameCtrl.text = u;
-      phoneNumberCtrl.text = p;
-      birthdayCtrl.text = b;
+      try {
+        String u = Utils.currentUser!.username ?? "";
+        String p = Utils.currentUser!.phone_number ?? "";
+        String b = Utils.currentUser!.birthday != null ? Utils.currentUser!.birthday!.toString().substring(0, 10) : "";
+        usernameCtrl.text = u;
+        phoneNumberCtrl.text = p;
+        birthdayCtrl.text = b;
+      }
+      catch(e) {
+        usernameCtrl.text = "";
+        phoneNumberCtrl.text = "";
+        birthdayCtrl.text = "";
+        print(e);
+      }
     });
   }
 
@@ -43,7 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
       birthday = birthdayCtrl.text;
 
       String u = Utils.currentUser!.username ?? "";
-      String p = Utils.currentUser!.phoneNumber ?? "";
+      String p = Utils.currentUser!.phone_number ?? "";
       String b = Utils.currentUser!.birthday != null ? Utils.currentUser!.birthday!.toString().substring(0, 10) : "";
       if (usernameCtrl.text == u &&
           phoneNumberCtrl.text == p &&
@@ -69,27 +77,31 @@ class _ProfilePageState extends State<ProfilePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Доброе утро!',
+                  'Добрый день!',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold
                   ),
                 ),
                 TextButton(
-                    onPressed: isButtonEnabled ? () {
-                      // TODO: saving user
-                    } : null,
+                    onPressed: () {
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AuthPage()));
+                      Utils.saveUserInSP("", "");
+                    },
                     child: Text(
-                      'Сохранить',
+                      'Выйти',
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20
+                          color: AppColor.pumpkin,
+                          fontSize: 18
                       ),
                     ),
-                  style: TextButton.styleFrom(
-                    backgroundColor: isButtonEnabled? AppColor.pumpkin : AppColor.notAvailable,
-                    padding: EdgeInsets.all(16)
-                  )
+                    style: TextButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.0),
+                            side: BorderSide(color: AppColor.pumpkin)
+                        ),
+                        padding: EdgeInsets.only(top: 20, bottom: 20, right: 40, left: 40)
+                    )
                 )
               ]
             ),
@@ -149,12 +161,38 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 SizedBox(height: 32),
                 TextButton(
+                    onPressed: isButtonEnabled ? () async {
+                      User? newUser = Utils.currentUser;
+                      newUser?.phone_number = phoneNumber;
+                      newUser?.birthday = birthday;
+                      bool result = await DbHandler.updateUser(newUser!, context);
+                      if (!result) {
+                        Utils.showAlertDialog(context, 'Ошибка при сохранении данных');
+                        return;
+                      }
+                      setState(() {
+                        isButtonEnabled = false;
+                      });
+                    } : null,
+                    child: Text(
+                      'Сохранить',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                        backgroundColor: isButtonEnabled? AppColor.pumpkin : AppColor.notAvailable,
+                        padding: EdgeInsets.only(top: 20, bottom: 20, right: 64, left: 64)
+                    )
+                ),
+                SizedBox(height: 20),
+                TextButton(
                     onPressed: () {
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AuthPage()));
-                      Utils.saveUserInSP("", "");
+                      Navigator.pushNamed(context, '/addresses');
                     },
                     child: Text(
-                      'Выйти',
+                      'Добавить адрес',
                       style: TextStyle(
                           color: AppColor.pumpkin,
                           fontSize: 18
@@ -162,13 +200,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     style: TextButton.styleFrom(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18.0),
+                            borderRadius: BorderRadius.circular(50.0),
                             side: BorderSide(color: AppColor.pumpkin)
                         ),
-                        padding: EdgeInsets.only(top: 20, bottom: 20, right: 66, left: 66)
+                        padding: EdgeInsets.only(top: 20, bottom: 20, right: 60, left: 60)
                     )
                 )
-              ],
+              ]
             ),
           )
         ]

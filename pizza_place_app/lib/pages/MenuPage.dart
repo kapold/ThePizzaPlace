@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:pizza_place_app/utils/AppColor.dart';
 import 'package:pizza_place_app/utils/CustomSearchDelegate.dart';
 
+import '../widgets/ListViewMenu.dart';
+
 class MenuPage extends StatefulWidget {
   const MenuPage({Key? key}) : super(key: key);
 
@@ -92,7 +94,9 @@ class _MenuPageState extends State<MenuPage> {
             )
           ),
           Padding(padding: EdgeInsets.all(10)),
-          // TODO: LIST
+          Expanded(
+            child: ListViewMenu()
+          )
         ],
       ),
     );

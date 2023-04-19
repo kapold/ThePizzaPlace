@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pizza_place_app/utils/AppColor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/Pizza.dart';
 import '../models/User.dart';
 
 class Utils {

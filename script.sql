@@ -1,19 +1,68 @@
 /* Utils */
 DROP DATABASE pizzaria;
 CREATE DATABASE pizzaria WITH OWNER admin;
+DROP TABLE Users;
 
 /* Database creation */
+CREATE TABLE Roles (
+    id serial PRIMARY KEY,
+    name text
+);
+
 CREATE TABLE Users (
     id serial PRIMARY KEY,
+    role_id integer NOT NULL REFERENCES Roles(id),
     username text NOT NULL UNIQUE,
     password text NOT NULL,
     phone_number text DEFAULT(NULL),
     birthday date DEFAULT(NULL)
 );
 
-INSERT INTO Users(username, password, phone_number, birthday)
-    VALUES ('Anton', '12345', '+375298689745', '2003-02-26'),
-           ('Dima', '12345', '+375298689746', '2003-02-26');
+CREATE TABLE DeliveryAddresses (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES Users(id),
+    address text NOT NULL
+);
+
+
+CREATE TABLE Pizzas (
+    id serial PRIMARY KEY,
+    name text NOT NULL UNIQUE,
+    description text,
+    price numeric(8,2) NOT NULL,
+    image text
+);
+
+
+CREATE TABLE Orders (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL REFERENCES Users(id),
+    delivery_id integer NOT NULL REFERENCES DeliveryAddresses(id),
+    created_at timestamp NOT NULL,
+    status text NOT NULL
+);
+
+CREATE TABLE PizzaDetails (
+    id serial PRIMARY KEY,
+    size text NOT NULL,
+    dough text NOT NULL,
+    add_cost numeric(8,2) NOT NULL
+);
+
+CREATE TABLE OrderDetails (
+    id serial PRIMARY KEY,
+    order_id integer NOT NULL REFERENCES Orders(id),
+    product_id integer NOT NULL REFERENCES Pizzas(id),
+    pizza_details_id integer NOT NULL REFERENCES PizzaDetails(id),
+    quantity integer NOT NULL DEFAULT(1)
+);
+
+/* INSERTS */
+INSERT INTO Roles(name)
+    VALUES ('customer'), ('seller');
+INSERT INTO Users(role_id, username, password, phone_number, birthday)
+    VALUES (1, 'Anton', '12345', '+375298689745', '2003-02-26'),
+           (1, 'Dima', '12345', '+375298689746', '2003-02-26');
 
 /* get_users */
 CREATE OR REPLACE FUNCTION get_users()
@@ -34,8 +83,8 @@ CREATE OR REPLACE PROCEDURE add_user(
     LANGUAGE plpgsql
 AS $$
 BEGIN
-    INSERT INTO Users (username, password, phone_number, birthday)
-        VALUES (p_username, p_password, p_phone_number, p_birthday);
+    INSERT INTO Users (role_id, username, password, phone_number, birthday)
+        VALUES (1, p_username, p_password, p_phone_number, p_birthday);
 END;
 $$;
 
@@ -61,4 +110,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* update_user */
+CREATE OR REPLACE FUNCTION update_user(
+    user_id INTEGER,
+    new_username VARCHAR,
+    new_phone_number VARCHAR,
+    new_birthday DATE
+) RETURNS VOID AS $$
+BEGIN
+UPDATE users SET
+                 username = new_username,
+                 phone_number = new_phone_number,
+                 birthday = new_birthday
+WHERE id = user_id;
+END;
+$$ LANGUAGE plpgsql;
+
 SELECT get_user_by_username_and_password('Anton', '12345')
+/*CALL update_user(1, 'new_username', 'new_phone_number', '2000-01-01');*/
