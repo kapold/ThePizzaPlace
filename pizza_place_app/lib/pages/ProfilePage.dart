@@ -100,7 +100,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 borderRadius: BorderRadius.circular(50.0),
                                 side: BorderSide(color: AppColor.pumpkin)
                             ),
-                            padding: EdgeInsets.only(top: 20, bottom: 20, right: 40, left: 40)
+                            padding: EdgeInsets.only(top: 14, bottom: 14, right: 40, left: 40)
                         )
                     )
                   ]
@@ -183,7 +183,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         style: TextButton.styleFrom(
                             backgroundColor: isButtonEnabled? AppColor.pumpkin : AppColor.notAvailable,
-                            padding: EdgeInsets.only(top: 20, bottom: 20, right: 64, left: 64)
+                            padding: EdgeInsets.only(top: 14, bottom: 14, right: 64, left: 64)
                         )
                     ),
                     SizedBox(height: 20),
@@ -204,7 +204,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 borderRadius: BorderRadius.circular(50.0),
                                 side: BorderSide(color: AppColor.pumpkin)
                             ),
-                            padding: EdgeInsets.only(top: 20, bottom: 20, right: 60, left: 60)
+                            padding: EdgeInsets.only(top: 14, bottom: 14, right: 60, left: 60)
                         )
                     )
                   ]

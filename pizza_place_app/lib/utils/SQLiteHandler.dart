@@ -2,6 +2,7 @@ import 'package:pizza_place_app/models/PizzaDetails.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+import '../models/CartItem.dart';
 import '../models/Pizza.dart';
 
 class SQLiteHandler {
@@ -40,22 +41,22 @@ class SQLiteHandler {
             quantity INTEGER NOT NULL DEFAULT 1,
             pizza_id INTEGER NOT NULL,
             FOREIGN KEY (pizza_id) REFERENCES Pizzas(id)
-          )
+          );
         '''
         );
         print("< Table 'Cart' created >");
 
-        db.rawInsert('''
-          INSERT INTO Pizzas (id, name, size, dough, cheese, price, image) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', [1, 'Margherita', '25 см', 'Толстое', 'Без сыра', 9.99, 'none']);
-        print("< Inserted into Pizzas >");
-
-        db.rawInsert('''
-          INSERT INTO Cart (pizza_id, quantity) 
-            VALUES (?, ?)
-        ''', [1, 2]);
-        print("< Inserted into Cart >");
+        // db.rawInsert('''
+        //   INSERT INTO Pizzas (id, name, size, dough, cheese, price, image)
+        //     VALUES (?, ?, ?, ?, ?, ?, ?)
+        // ''', [1, 'Margherita', '25 см', 'Толстое', 'Без сыра', 9.99, 'none']);
+        // print("< Inserted into Pizzas >");
+        //
+        // db.rawInsert('''
+        //   INSERT INTO Cart (pizza_id, quantity)
+        //     VALUES (?, ?)
+        // ''', [1, 2]);
+        // print("< Inserted into Cart >");
       },
     );
     _database = database;
@@ -67,13 +68,65 @@ class SQLiteHandler {
     return await db.delete('Pizzas');
   }
 
-  Future<int> addPizza(Pizza pizza, PizzaDetails details) async {
+  Future<void> addPizza(CartItem item) async {
     final db = await database;
-    String sql = "";
-    // String sql = '''
-    //   INSERT INTO Pizzas(id, name, size, dough, cheese, price, quantity, image)
-    //   VALUES(${pizza.id}, "${pizza.name}", "${size}", "${dough}", "${cheese}", ${totalPrice}, ${quantity}, "${pizza.image}")
-    // ''';
-    return await db.rawInsert(sql);
+    try {
+      await db.rawInsert(
+          'INSERT INTO Pizzas(id, name, size, dough, cheese, price, image) '
+              'VALUES(?, ?, ?, ?, ?, ?, ?)',
+          [item.pizza_id, item.name, item.size, item.dough, item.cheese, item.price, item.image]);
+      await db.rawInsert(
+          'INSERT INTO Cart(quantity, pizza_id) '
+              'VALUES(?, ?)',
+          [1, item.pizza_id]);
+    }
+    catch (e) {
+      print('Error inserting pizza and cart: $e');
+    }
+  }
+
+  Future<List<CartItem>> getPizzasInCart() async {
+    try {
+      final Database db = await database;
+
+      final List<Map<String, dynamic>> results = await db.rawQuery('''
+        SELECT Cart.id, Cart.pizza_id, Pizzas.name, Pizzas.size, Pizzas.dough, Pizzas.cheese,
+             Pizzas.price, Pizzas.image, Cart.quantity
+        FROM Pizzas
+        JOIN Cart ON Pizzas.id = Cart.pizza_id
+      ''');
+
+      final List<CartItem> cartItems = [];
+
+      for (final row in results) {
+        final cartItem = CartItem(
+          id: row['id'],
+          pizza_id: row['pizza_id'],
+          quantity: row['quantity'],
+          name: row['name'],
+          size: row['size'],
+          dough: row['dough'],
+          cheese: row['cheese'],
+          price: row['price'],
+          image: row['image'],
+        );
+        cartItems.add(cartItem);
+      }
+
+      return cartItems;
+    } catch (e) {
+      print('Error getting pizzas in cart: $e');
+      return [];
+    }
+  }
+
+  Future<void> incrementQuantity(int pizzaId) async {
+    final Database db = await database;
+    await db.rawUpdate('UPDATE Cart SET quantity = quantity + 1 WHERE pizza_id = ?', [pizzaId]);
+  }
+
+  Future<void> decrementQuantity(int pizzaId) async {
+    final Database db = await database;
+    await db.rawUpdate('UPDATE Cart SET quantity = quantity - 1 WHERE pizza_id = ?', [pizzaId]);
   }
 }

@@ -113,7 +113,7 @@ class _ListViewMenuState extends State<ListViewMenu> {
     return isLoading
         ? Center(child: CircularProgressIndicator())
         : ListView.builder(
-      itemCount: pizzas.length,
+        itemCount: pizzas.length,
         itemBuilder: (BuildContext context, int index) {
           final pizza = pizzas[index];
           return InkWell(

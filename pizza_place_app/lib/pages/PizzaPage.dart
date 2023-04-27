@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pizza_place_app/models/CartItem.dart';
 import 'package:pizza_place_app/utils/AppColor.dart';
 import 'package:pizza_place_app/utils/CustomSearchDelegate.dart';
 import 'package:pizza_place_app/utils/SQLiteHandler.dart';
@@ -209,8 +210,17 @@ class _PizzaPageState extends State<PizzaPage> {
             padding: EdgeInsets.all(16),
             child: TextButton(
                 onPressed: () async {
-                  //int result = await SQLiteHandler().addPizza(currentPizza, _selectedSize, _selectedDough, _selectedCheese, 1, (currentPizza.price! + _additionalSizePrice + _additionalCheesePrice));
-                  //print("Result of Pizza insertion: " + result.toString());
+                  CartItem cartItem = CartItem(
+                    pizza_id: currentPizza.id,
+                    quantity: 1,
+                    name: currentPizza.name,
+                    size: _selectedSize,
+                    dough: _selectedDough,
+                    cheese: _selectedCheese,
+                    price: currentPizza.price,
+                    image: currentPizza.image
+                  );
+                  await SQLiteHandler().addPizza(cartItem);
                 },
                 child: Text(
                   'Добавить в корзину за ${(currentPizza.price! + _additionalSizePrice + _additionalCheesePrice).toStringAsFixed(2)}',
