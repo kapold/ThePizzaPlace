@@ -1,15 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_place_app/pages/MainPage.dart';
+import 'package:pizza_place_app/pages/ProfilePage.dart';
 import 'package:pizza_place_app/utils/AppColor.dart';
 
 import '../models/Pizza.dart';
+import '../pages/PizzaPage.dart';
+import '../utils/DbHandler.dart';
+import '../utils/Utils.dart';
 
-class ListViewMenu extends StatelessWidget {
-  final List<Pizza> pizzas = [
-    Pizza(id: 1, name: 'Маргарита', description: 'Описаниеееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееееее',
-        price: 20.99, image: 'none'),
-    Pizza(id: 2, name: 'Цыпленок', description: 'Описание...', price: 21.99, image: 'none'),
-    Pizza(id: 3, name: 'ПЕСТО', description: 'Описание...', price: 22.99, image: 'none')
-  ];
+class ListViewMenu extends StatefulWidget {
+  @override
+  _ListViewMenuState createState() => _ListViewMenuState();
+}
+
+class _ListViewMenuState extends State<ListViewMenu> {
+  List<Pizza> pizzas = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchPizzas();
+  }
+
+  Future<void> _fetchPizzas() async {
+    try {
+      pizzas = await DbHandler.fetchPizzas();
+    } catch (e) {
+      print(e);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   Widget createPizzaContainer(Pizza pizza) {
     return Container(
@@ -21,7 +45,7 @@ class ListViewMenu extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: AppColor.pumpkin,
-            blurRadius: 10.0,
+            blurRadius: 2.0,
           ),
         ],
       ),
@@ -60,12 +84,20 @@ class ListViewMenu extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 8),
-                Text(
-                  '${pizza.price} ₽',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                        color: AppColor.pumpkin,
+                        borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: Text(
+                      '${pizza.price} BYN',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white
+                      ),
+                    )
                 )
               ],
             ),
@@ -78,11 +110,22 @@ class ListViewMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return isLoading
+        ? Center(child: CircularProgressIndicator())
+        : ListView.builder(
       itemCount: pizzas.length,
         itemBuilder: (BuildContext context, int index) {
           final pizza = pizzas[index];
-          return createPizzaContainer(pizza);
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PizzaPage(),
+                  settings: RouteSettings(arguments: pizza)
+              ));
+            },
+            child: createPizzaContainer(pizza)
+          );
         }
     );
   }

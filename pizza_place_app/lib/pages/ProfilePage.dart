@@ -68,149 +68,150 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(32),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Добрый день!',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold
-                  ),
-                ),
-                TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AuthPage()));
-                      Utils.saveUserInSP("", "");
-                    },
-                    child: Text(
-                      'Выйти',
+    return SafeArea(
+      child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(32),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Добрый день!',
                       style: TextStyle(
-                          color: AppColor.pumpkin,
-                          fontSize: 18
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold
                       ),
                     ),
-                    style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50.0),
-                            side: BorderSide(color: AppColor.pumpkin)
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AuthPage()));
+                          Utils.saveUserInSP("", "");
+                        },
+                        child: Text(
+                          'Выйти',
+                          style: TextStyle(
+                              color: AppColor.pumpkin,
+                              fontSize: 18
+                          ),
                         ),
-                        padding: EdgeInsets.only(top: 20, bottom: 20, right: 40, left: 40)
+                        style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50.0),
+                                side: BorderSide(color: AppColor.pumpkin)
+                            ),
+                            padding: EdgeInsets.only(top: 20, bottom: 20, right: 40, left: 40)
+                        )
                     )
-                )
-              ]
+                  ]
+              ),
             ),
-          ),
-          SizedBox(height: 32),
-          Container(
-            padding: EdgeInsets.only(left: 32, right: 32, top: 16, bottom: 16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                TextField(
-                  controller: usernameCtrl,
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                      borderSide: const BorderSide(color: Colors.grey),
+            SizedBox(height: 32),
+            Container(
+              padding: EdgeInsets.only(left: 32, right: 32, top: 16, bottom: 16),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextField(
+                        controller: usernameCtrl,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                            border: const OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                              borderSide: const BorderSide(color: Colors.grey),
+                            ),
+                            prefixIcon: Container(
+                                child: Icon(Icons.accessibility),
+                                padding: EdgeInsets.only(left: 16, right: 16)
+                            ),
+                            hintText: "Имя"
+                        )
                     ),
-                    prefixIcon: Container(
-                      child: Icon(Icons.accessibility),
-                      padding: EdgeInsets.only(left: 16, right: 16)
-                    ),
-                    hintText: "Имя"
-                  )
-                ),
-                SizedBox(height: 24),
-                TextField(
-                    controller: phoneNumberCtrl,
-                    decoration: InputDecoration(
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                          borderSide: const BorderSide(color: Colors.grey),
-                        ),
-                        prefixIcon: Container(
-                            child: Icon(Icons.phone),
-                            padding: EdgeInsets.only(left: 16, right: 16)
-                        ),
-                        hintText: "Телефон"
-                    ),
-                ),
-                SizedBox(height: 24),
-                TextField(
-                    controller: birthdayCtrl,
-                    decoration: InputDecoration(
-                        border: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                          borderSide: const BorderSide(color: Colors.grey),
-                        ),
-                        prefixIcon: Container(
-                            child: Icon(Icons.date_range),
-                            padding: EdgeInsets.only(left: 16, right: 16)
-                        ),
-                        hintText: "День рождения",
-                        helperText: "Формат даты: ГГГГ-ММ-ДД"
-                    ),
-                    maxLength: 10,
-                ),
-                SizedBox(height: 32),
-                TextButton(
-                    onPressed: isButtonEnabled ? () async {
-                      User? newUser = Utils.currentUser;
-                      newUser?.phone_number = phoneNumber;
-                      newUser?.birthday = birthday;
-                      bool result = await DbHandler.updateUser(newUser!, context);
-                      if (!result) {
-                        Utils.showAlertDialog(context, 'Ошибка при сохранении данных');
-                        return;
-                      }
-                      setState(() {
-                        isButtonEnabled = false;
-                      });
-                    } : null,
-                    child: Text(
-                      'Сохранить',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20
+                    SizedBox(height: 24),
+                    TextField(
+                      controller: phoneNumberCtrl,
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          prefixIcon: Container(
+                              child: Icon(Icons.phone),
+                              padding: EdgeInsets.only(left: 16, right: 16)
+                          ),
+                          hintText: "Телефон"
                       ),
                     ),
-                    style: TextButton.styleFrom(
-                        backgroundColor: isButtonEnabled? AppColor.pumpkin : AppColor.notAvailable,
-                        padding: EdgeInsets.only(top: 20, bottom: 20, right: 64, left: 64)
-                    )
-                ),
-                SizedBox(height: 20),
-                TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/addresses');
-                    },
-                    child: Text(
-                      'Добавить адрес',
-                      style: TextStyle(
-                          color: AppColor.pumpkin,
-                          fontSize: 18
+                    SizedBox(height: 24),
+                    TextField(
+                      controller: birthdayCtrl,
+                      decoration: InputDecoration(
+                          border: const OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          prefixIcon: Container(
+                              child: Icon(Icons.date_range),
+                              padding: EdgeInsets.only(left: 16, right: 16)
+                          ),
+                          hintText: "День рождения",
+                          helperText: "Формат даты: ГГГГ-ММ-ДД"
                       ),
+                      maxLength: 10,
                     ),
-                    style: TextButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50.0),
-                            side: BorderSide(color: AppColor.pumpkin)
+                    SizedBox(height: 32),
+                    TextButton(
+                        onPressed: isButtonEnabled ? () async {
+                          User? newUser = Utils.currentUser;
+                          newUser?.phone_number = phoneNumber;
+                          newUser?.birthday = birthday;
+                          bool result = await DbHandler.updateUser(newUser!, context);
+                          if (!result) {
+                            Utils.showAlertDialog(context, 'Ошибка при сохранении данных');
+                            return;
+                          }
+                          setState(() {
+                            isButtonEnabled = false;
+                          });
+                        } : null,
+                        child: Text(
+                          'Сохранить',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20
+                          ),
                         ),
-                        padding: EdgeInsets.only(top: 20, bottom: 20, right: 60, left: 60)
+                        style: TextButton.styleFrom(
+                            backgroundColor: isButtonEnabled? AppColor.pumpkin : AppColor.notAvailable,
+                            padding: EdgeInsets.only(top: 20, bottom: 20, right: 64, left: 64)
+                        )
+                    ),
+                    SizedBox(height: 20),
+                    TextButton(
+                        onPressed: () async {
+                          Utils.userAddresses = await DbHandler.getUserAddresses(Utils.currentUser?.id, context);
+                          Navigator.pushNamed(context, '/addresses');
+                        },
+                        child: Text(
+                          'Добавить адрес',
+                          style: TextStyle(
+                              color: AppColor.pumpkin,
+                              fontSize: 18
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(50.0),
+                                side: BorderSide(color: AppColor.pumpkin)
+                            ),
+                            padding: EdgeInsets.only(top: 20, bottom: 20, right: 60, left: 60)
+                        )
                     )
-                )
-              ]
-            ),
-          )
-        ]
-      ),
+                  ]
+              ),
+            )
+          ]
+      )
     );
   }
 }

@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pizza_place_app/utils/AppColor.dart';
 import 'package:pizza_place_app/utils/CustomSearchDelegate.dart';
+import 'package:pizza_place_app/utils/SQLiteHandler.dart';
 
+import '../utils/DbHandler.dart';
+import '../utils/Utils.dart';
 import '../widgets/ListViewMenu.dart';
 
 class MenuPage extends StatefulWidget {
@@ -22,6 +25,12 @@ class _MenuPageState extends State<MenuPage> {
     super.initState();
     _timeString = _formatDateTime(DateTime.now());
     _timer = Timer.periodic(Duration(seconds: 1), (Timer t) => _getCurrentTime());
+    initLocalDB();
+  }
+
+  void initLocalDB() async {
+    SQLiteHandler sqLiteHandler = SQLiteHandler();
+    await sqLiteHandler.initializeDatabase();
   }
 
   String _formatDateTime(DateTime dateTime) {
@@ -44,9 +53,8 @@ class _MenuPageState extends State<MenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
+    return SafeArea(
+      child: Column(
         children: [
           Container(
             color: Colors.transparent,
@@ -67,7 +75,7 @@ class _MenuPageState extends State<MenuPage> {
                   ),
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColor.pumpkin,
+                    backgroundColor: AppColor.pumpkin,
                   ),
                 ),
                 Padding(padding: EdgeInsets.only(left: 16)),
@@ -86,19 +94,19 @@ class _MenuPageState extends State<MenuPage> {
           ),
           Padding(padding: EdgeInsets.all(10)),
           Container(
-            padding: EdgeInsets.only(left: 20),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Выгодно и вкусно',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)
-            )
+              padding: EdgeInsets.only(left: 20),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                  'Выгодно и вкусно',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)
+              )
           ),
           Padding(padding: EdgeInsets.all(10)),
           Expanded(
-            child: ListViewMenu()
+              child: ListViewMenu()
           )
         ],
-      ),
+      )
     );
   }
 }

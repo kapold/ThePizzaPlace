@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:pizza_place_app/utils/AppColor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../models/Pizza.dart';
+import '../models/Address.dart';
 import '../models/User.dart';
 
 class Utils {
   static User? currentUser = null;
+  static late List<Address> userAddresses;
 
   static AlertDialog showAlertDialog(BuildContext context, String message) {
     Widget okButton = TextButton(

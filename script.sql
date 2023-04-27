@@ -63,6 +63,10 @@ INSERT INTO Roles(name)
 INSERT INTO Users(role_id, username, password, phone_number, birthday)
     VALUES (1, 'Anton', '12345', '+375298689745', '2003-02-26'),
            (1, 'Dima', '12345', '+375298689746', '2003-02-26');
+INSERT INTO Pizzas(name, description, price, image)
+    VALUES ('Маргарита', 'Бекон, сыры чеддер и пармезан, моцарелла, томаты, соус альфредо, красный лук, чеснок, итальянские травы', 17.90, 'none'),
+           ('Аррива', 'Цыпленок, чоризо, соус бургер, томаты, сладкий перец, лук красный, чеснок, моцарелла, соус ранч', 17.90, 'none'),
+           ('Дон бекон', 'Томатный соус, цыпленок филе, пикантная пепперони, красный лук, моцарелла, бекон', 20.90, 'none');
 
 /* get_users */
 CREATE OR REPLACE FUNCTION get_users()
@@ -72,6 +76,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* get_pizzas */
+CREATE OR REPLACE FUNCTION get_pizzas()
+    RETURNS SETOF Pizzas AS $$
+BEGIN
+    RETURN QUERY SELECT * FROM Pizzas;
+END;
+$$ LANGUAGE plpgsql;
+
+/* get_user_addresses */
+CREATE FUNCTION get_user_addresses(user_id INTEGER)
+    RETURNS SETOF DeliveryAddresses AS $$
+BEGIN
+    RETURN QUERY SELECT * FROM DeliveryAddresses WHERE DeliveryAddresses.user_id = $1;
+END;
+$$ LANGUAGE plpgsql;
 
 /* add_user */
 CREATE OR REPLACE PROCEDURE add_user(
@@ -87,6 +106,14 @@ BEGIN
         VALUES (1, p_username, p_password, p_phone_number, p_birthday);
 END;
 $$;
+
+/* add_address */
+CREATE OR REPLACE FUNCTION add_address(new_user_id integer, new_address text)
+    RETURNS void AS $$
+BEGIN
+    INSERT INTO DeliveryAddresses(user_id, address) VALUES (new_user_id, new_address);
+END;
+$$ LANGUAGE plpgsql;
 
 /* get_user_by_username_and_password */
 CREATE OR REPLACE FUNCTION get_user_by_username_and_password(name_in text, password_in text)
@@ -126,5 +153,13 @@ WHERE id = user_id;
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT get_user_by_username_and_password('Anton', '12345')
+/* delete_address */
+CREATE OR REPLACE FUNCTION delete_address(address_id integer)
+    RETURNS void AS $$
+BEGIN
+    DELETE FROM DeliveryAddresses WHERE id = address_id;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT get_user_by_username_and_password('Anton', '12345');
 /*CALL update_user(1, 'new_username', 'new_phone_number', '2000-01-01');*/

@@ -1,12 +1,15 @@
 const express = require('express');
 const crypto = require('crypto');
+const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const DatabaseApi = require('./DatabaseApi');
 const app = express();
 const db = new DatabaseApi();
 const port = 3000;
+
 app.use(bodyParser.json());
+app.use(cors({ origin: '*' }));
 
 /* GET */
 app.get('/', (req, res) => {
@@ -21,7 +24,6 @@ app.get('/', (req, res) => {
     });
 });
 
-
 app.get('/users', async (req, res) => {
     try {
         const rows = await db.getUsers();
@@ -29,6 +31,27 @@ app.get('/users', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Error fetching users');
+    }
+});
+
+app.get('/pizzas', async (req, res) => {
+    try {
+        const rows = await db.getPizzas();
+        res.send(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching pizzas');
+    }
+});
+
+app.get('/addresses/:user_id', async (req, res) => {
+    const userId = req.params.user_id;
+    try {
+        const rows = await db.getUserAddresses(userId);
+        res.send(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching user addresses');
     }
 });
 
@@ -53,6 +76,23 @@ app.post('/users', async (req, res) => {
     }
 });
 
+app.post('/addresses', async (req, res) => {
+    try {
+        const {user_id, address} = req.body;
+        const result = await db.addAddress(user_id, address);
+
+        if (result) {
+            res.status(201).send('Address added successfully');
+            console.log('Address added successfully 201')
+        } else {
+            res.status(500).send('Error adding Address');
+            console.log('Error adding Address 500')
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error adding Address');
+    }
+});
 
 app.post('/login', async (req, res) => {
     const {username, password} = req.body;
@@ -84,6 +124,18 @@ app.put('/users', async (req, res) => {
     }
 });
 
+/* DELETE */
+app.delete('/addresses/:id', async (req, res) => {
+    const addressID = req.params.id;
+    console.log("Address id: " + addressID);
+    try {
+        await db.deleteAddress(addressID);
+        res.sendStatus(201);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
+});
 
 /* LISTEN */
 app.listen(port, () => {
