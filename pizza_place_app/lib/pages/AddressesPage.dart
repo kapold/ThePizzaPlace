@@ -96,10 +96,7 @@ class _AddressesPageState extends State<AddressesPage> {
                 return Dismissible(
                   key: Key(item.address.toString()),
                   onDismissed: (direction) async {
-                    // TODO: fix address delete
                     await DbHandler.deleteUserAddress(item.id!);
-                    Utils.userAddresses = await DbHandler.getUserAddresses(Utils.currentUser?.id, context);
-
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Адрес `${item.address.toString()}` удален'),

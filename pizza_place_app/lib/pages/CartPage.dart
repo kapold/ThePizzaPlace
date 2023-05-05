@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:pizza_place_app/models/PizzaDetails.dart';
 import 'package:pizza_place_app/utils/SQLiteHandler.dart';
 
 import '../models/Address.dart';
 import '../models/CartItem.dart';
 import '../utils/AppColor.dart';
+import '../utils/DbHandler.dart';
 import '../utils/Utils.dart';
 
 class CartPage extends StatefulWidget {
@@ -17,15 +19,15 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   List<CartItem> cart = [];
-  bool isLoading = true;
+  bool isLoading = true, addressesCheck = false;
   double _totalPrice = 0;
-  late String _selectedItem;
-  // TODO: create Cart
+  String _selectedItem = "";
 
   @override
   void initState() {
     super.initState();
     _showCart();
+    _selectedItem = Utils.userAddresses[0].address!;
   }
 
   Future<void> _showCart() async {
@@ -59,6 +61,50 @@ class _CartPageState extends State<CartPage> {
     }
     return totalPrice;
   }
+
+
+  Widget checkUserAddresses() {
+    if (Utils.userAddresses.isNotEmpty) {
+      addressesCheck = true;
+      return DropdownButton<String>(
+        value: _selectedItem,
+        icon: const Icon(Icons.keyboard_arrow_down),
+        items: Utils.userAddresses.map((Address item) {
+          return DropdownMenuItem<String>(
+            value: item.address.toString(),
+            child: Text(item.address.toString()),
+          );
+        }).toList(),
+        onChanged: (String? selectedItem) {
+          setState(() {
+            _selectedItem = selectedItem!;
+          });
+        },
+        underline: Container(),
+        style: TextStyle(fontSize: 18, color: Colors.black),
+        dropdownColor: AppColor.pumpkin,
+        iconEnabledColor: Colors.black, //Icon color
+      );
+    } else {
+      addressesCheck = false;
+      return TextButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/addresses');
+          },
+          child: Text(
+            'добавить адрес',
+            style: TextStyle(
+                color: AppColor.pumpkin,
+                fontSize: 18
+            ),
+          ),
+          style: TextButton.styleFrom(
+              padding: EdgeInsets.only(top: 14, bottom: 14, right: 10, left: 10)
+          )
+      );
+    }
+  }
+
 
   Widget createCartItem(CartItem item) {
     double addPriceForSize = 0, addPriceForCheese = 0;
@@ -153,12 +199,12 @@ class _CartPageState extends State<CartPage> {
                       children: [
                         IconButton(
                           onPressed: () {
-                            if (item.quantity == 1)
-                              return;
                             SQLiteHandler().decrementQuantity(item.pizza_id!);
                             setState(() {
                               item.quantity = item.quantity! - 1;
                               _totalPrice = _getTotalPrice();
+                              if (item.quantity == 0)
+                                cart.remove(item);
                             });
                           },
                           icon: Icon(Icons.remove,  color: AppColor.pumpkin)
@@ -198,7 +244,7 @@ class _CartPageState extends State<CartPage> {
     return Scaffold(
       body: Container(
         alignment: Alignment.center,
-        child: isLoading ?
+        child: isLoading || cart.isEmpty ?
           Image.asset('assets/icons/emptyCart.png') :
           SafeArea(
             child: Column(
@@ -214,24 +260,37 @@ class _CartPageState extends State<CartPage> {
                   )
                 ),
                 Divider(),
-                DropdownButton<String>(
-                  value: _selectedItem,
-                  items: Utils.userAddresses.map((Address item) {
-                    return DropdownMenuItem<String>(
-                      value: item.toString(),
-                      child: Text(item.toString()),
-                    );
-                  }).toList(),
-                  onChanged: (String? selectedItem) {
-                    setState(() {
-                      _selectedItem = selectedItem!;
-                    });
-                  },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      'Адрес доставки: ',
+                      style: TextStyle(fontSize: 18)
+                    ),
+                    checkUserAddresses()
+                  ]
                 ),
                 SizedBox(height: 6),
                 TextButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      int? address_id = Utils.userAddresses.firstWhere((address) => address.address == _selectedItem).id;
+                      int order_id = await DbHandler.addOrder(Utils.currentUser!.id!, address_id!, "in progress",  context);
+                      List<PizzaDetails> details = await DbHandler.getPizzaDetails();
 
+                      for (var item in cart) {
+                        PizzaDetails? detail = details.firstWhere((detail) => (detail.size == item.size && detail.dough == item.dough && detail.cheese == item.cheese));
+                        DbHandler.addOrderDetails(
+                            order_id,
+                            detail.id!,
+                            item.quantity!,
+                            item.pizza_id!,
+                            context
+                        ).then((_) {});
+                      }
+
+                      Utils.showAlertDialog(context, "Заказ добавлен :)");
+                      SQLiteHandler().clearPizzas();
+                      setState(() { cart = []; });
                     },
                     child: Text(
                       'Оформить заказ за ${_totalPrice.toStringAsFixed(2)} BYN',

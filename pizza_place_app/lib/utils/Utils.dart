@@ -34,10 +34,17 @@ class Utils {
     return alert;
   }
 
-  static Future<void> saveUserInSP(String username, String password) async {
+  static void showListInfo(List list) {
+    print("<----- List info ----->");
+    for(var item in list)
+      print(item.toString());
+  }
+
+  static Future<bool> saveUserInSP(String username, String password) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('username', username);
     await prefs.setString('password', password);
+    return true;
   }
 
   static Future<String?> getUsernameFromSP() async {

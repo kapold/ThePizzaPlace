@@ -31,6 +31,16 @@ class DatabaseApi {
         }
     }
 
+    async getPizzaDetails() {
+        try {
+            const { rows } = await this.pool.query('SELECT * FROM get_pizza_details()');
+            return rows;
+        } catch (error) {
+            console.error(error);
+            throw new Error('Error fetching pizza details');
+        }
+    }
+
     async addUser(username, password, phoneNumber, birthday) {
         try {
             await this.pool.query('BEGIN');
@@ -46,6 +56,23 @@ class DatabaseApi {
             console.error('Error adding user to database', e);
             await this.pool.query('ROLLBACK');
             return false;
+        }
+    }
+
+    async addOrder(user_id, delivery_id, status) {
+        try {
+            const result = await this.pool.query('SELECT create_order($1, $2, $3)', [user_id, delivery_id, status]);
+            return result.rows;
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async addOrderDetails(order_id, pizza_details_id, quantity, product_id) {
+        try {
+            await this.pool.query('SELECT create_order_details($1, $2, $3, $4)', [order_id, pizza_details_id, quantity, product_id]);
+        } catch (err) {
+            console.error(err);
         }
     }
 
@@ -88,6 +115,15 @@ class DatabaseApi {
         return result.rows[0];
     }
 
+    async getUserByUsername(username) {
+        const query = {
+            text: 'SELECT get_user_by_username($1, $2)',
+            values: [username]
+        };
+        const result = await this.pool.query(query);
+        return result.rows[0];
+    }
+
     async getUserAddresses(userId) {
         try {
             const { rows } = await this.pool.query('SELECT * FROM get_user_addresses($1)', [userId]);
@@ -95,6 +131,26 @@ class DatabaseApi {
         } catch (error) {
             console.error(error);
             throw new Error('Error fetching user addresses');
+        }
+    }
+
+    async getUserOrders(user_id, status) {
+        try {
+            const { rows } = await this.pool.query('SELECT * FROM get_user_orders($1, $2)', [user_id, status]);
+            return rows;
+        } catch (error) {
+            console.error(error);
+            throw new Error('Error fetching user orders');
+        }
+    }
+
+    async getOrderItems(order_id) {
+        try {
+            const { rows } = await this.pool.query('SELECT * FROM get_order_items($1)', [order_id]);
+            return rows;
+        } catch (error) {
+            console.error(error);
+            throw new Error('Error fetching order items');
         }
     }
 

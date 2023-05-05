@@ -55,6 +55,38 @@ app.get('/addresses/:user_id', async (req, res) => {
     }
 });
 
+app.get('/orders', async (req, res) => {
+    const { user_id, status } = req.query;
+    try {
+        const rows = await db.getUserOrders(user_id, status);
+        res.send(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching user orders');
+    }
+});
+
+app.get('/order_details', async (req, res) => {
+    const { order_id } = req.query;
+    try {
+        const rows = await db.getOrderItems(order_id);
+        res.send(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching order items');
+    }
+});
+
+app.get('/pizza_details', async (req, res) => {
+    try {
+        const rows = await db.getPizzaDetails();
+        res.send(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching pizza details');
+    }
+});
+
 
 /* POST */
 app.post('/users', async (req, res) => {
@@ -102,6 +134,30 @@ app.post('/login', async (req, res) => {
         res.json(user.get_user_by_username_and_password);
     } else {
         res.status(401).json({message: 'Invalid credentials'});
+    }
+});
+
+app.post('/orders', async (req, res) => {
+    const { user_id, delivery_id, status } = req.body;
+
+    try {
+        const order = await db.addOrder(user_id, delivery_id, status);
+        res.status(200).json(order);
+    }
+    catch (e) {
+        res.status(200).json({message: e});
+    }
+});
+
+app.post('/order_details', async (req, res) => {
+    const { order_id, pizza_details_id, quantity, product_id } = req.body;
+
+    try {
+        await db.addOrderDetails(order_id, pizza_details_id, quantity, product_id);
+        res.status(200);
+    }
+    catch (e) {
+        res.status(200).json({message: e});
     }
 });
 

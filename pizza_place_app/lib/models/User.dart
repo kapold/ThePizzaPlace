@@ -28,6 +28,6 @@ class User {
 
   @override
   String toString() {
-    return 'User{id: $id, name: $username, password: $password phone_number: $phone_number, birth: $birthday}';
+    return 'User{id: $id, role_id: ${role_id}, name: $username, password: $password phone_number: $phone_number, birth: $birthday}';
   }
 }

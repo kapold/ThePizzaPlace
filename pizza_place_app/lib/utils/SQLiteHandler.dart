@@ -45,27 +45,16 @@ class SQLiteHandler {
         '''
         );
         print("< Table 'Cart' created >");
-
-        // db.rawInsert('''
-        //   INSERT INTO Pizzas (id, name, size, dough, cheese, price, image)
-        //     VALUES (?, ?, ?, ?, ?, ?, ?)
-        // ''', [1, 'Margherita', '25 см', 'Толстое', 'Без сыра', 9.99, 'none']);
-        // print("< Inserted into Pizzas >");
-        //
-        // db.rawInsert('''
-        //   INSERT INTO Cart (pizza_id, quantity)
-        //     VALUES (?, ?)
-        // ''', [1, 2]);
-        // print("< Inserted into Cart >");
       },
     );
     _database = database;
     return database;
   }
 
-  Future<int> clearPizzas() async {
+  Future<void> clearPizzas() async {
     final db = await database;
-    return await db.delete('Pizzas');
+    await db.delete('Cart');
+    await db.delete('Pizzas');
   }
 
   Future<void> addPizza(CartItem item) async {
@@ -127,6 +116,35 @@ class SQLiteHandler {
 
   Future<void> decrementQuantity(int pizzaId) async {
     final Database db = await database;
-    await db.rawUpdate('UPDATE Cart SET quantity = quantity - 1 WHERE pizza_id = ?', [pizzaId]);
+    // Получаем количество товаров в корзине для данного пиццы
+    int? quantity = Sqflite.firstIntValue(await db.rawQuery(
+      'SELECT quantity FROM Cart WHERE pizza_id = ?',
+      [pizzaId],
+    ));
+
+    if (quantity == 1) {
+      // Если осталась 1 пицца в корзине, удаляем ее из таблицы Cart
+      await db.delete('Cart', where: 'pizza_id = ?', whereArgs: [pizzaId]);
+      await db.delete('Pizzas', where: 'id = ?', whereArgs: [pizzaId]);
+    } else {
+      // Иначе уменьшаем количество товаров в корзине на 1
+      await db.update(
+        'Cart',
+        {'quantity': quantity! - 1},
+        where: 'pizza_id = ?',
+        whereArgs: [pizzaId],
+      );
+    }
+
+    // Получаем количество товаров в корзине для данного пиццы после изменения
+    quantity = Sqflite.firstIntValue(await db.rawQuery(
+      'SELECT quantity FROM Cart WHERE pizza_id = ?',
+      [pizzaId],
+    ));
+
+    if (quantity == 0) {
+      // Если количество товаров в корзине стало 0, удаляем запись из таблицы Pizzas
+      await db.delete('Pizzas', where: 'id = ?', whereArgs: [pizzaId]);
+    }
   }
 }

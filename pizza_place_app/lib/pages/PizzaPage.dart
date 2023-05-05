@@ -221,6 +221,7 @@ class _PizzaPageState extends State<PizzaPage> {
                     image: currentPizza.image
                   );
                   await SQLiteHandler().addPizza(cartItem);
+                  Utils.showAlertDialog(context, "Товар добавлен в корзину!");
                 },
                 child: Text(
                   'Добавить в корзину за ${(currentPizza.price! + _additionalSizePrice + _additionalCheesePrice).toStringAsFixed(2)}',

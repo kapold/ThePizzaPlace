@@ -2,7 +2,7 @@ class PizzaDetails {
   int? id;
   String? size;
   String? dough;
-  double? cheese;
+  String? cheese;
 
   PizzaDetails({
     required this.id,
@@ -22,6 +22,6 @@ class PizzaDetails {
 
   @override
   String toString() {
-    return 'PizzaDetails{id: $id, name: $size, description: $dough, price: $cheese}';
+    return 'PizzaDetails{id: $id, size: $size, dough: $dough, cheese: $cheese}';
   }
 }

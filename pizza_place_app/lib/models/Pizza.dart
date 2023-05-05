@@ -18,7 +18,7 @@ class Pizza {
       id: json['id'],
       name: json['name'] ?? null,
       description: json['description'] ?? null,
-      price: double.parse(json['price'].toString()) ?? null,
+      price: double.parse(json['price'].toString()),
       image: json['image'] ?? null,
     );
   }

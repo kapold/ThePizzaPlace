@@ -39,10 +39,25 @@ class _MainPageState extends State<MainPage> {
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    String? usernameSP = prefs.getString('username');
-    String? passwordSP = prefs.getString('password');
-    Utils.currentUser = await DbHandler.login(usernameSP!, passwordSP!, context);
+    String? usernameSP = await prefs.getString('username');
+    String? passwordSP = await prefs.getString('password');
+    if (usernameSP != "" && passwordSP != "") {
+      print("! Preferences loaded ! -> name: ${usernameSP}, password: ${passwordSP}");
+      _loadUser(usernameSP!, passwordSP!);
+    }
+  }
+
+  Future<void> _loadUser(String username, String password) async {
+    print("! Try to get User !");
+    Utils.currentUser = await DbHandler.login(username, password, context);
     print(Utils.currentUser);
+    if (Utils.currentUser != null) {
+      print("! User logged !");
+      Utils.userAddresses = await DbHandler.getUserAddresses(Utils.currentUser?.id, context);
+      print("Количество адресов пользователя: ${Utils.userAddresses.length}");
+    } else {
+      Utils.userAddresses = [];
+    }
   }
 
   @override
