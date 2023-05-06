@@ -68,6 +68,14 @@ class DatabaseApi {
         }
     }
 
+    async addPizza(name, description, price, image) {
+        try {
+            await this.pool.query('SELECT add_pizza($1, $2, $3, $4)', [name, description, price, image]);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     async addOrderDetails(order_id, pizza_details_id, quantity, product_id) {
         try {
             await this.pool.query('SELECT create_order_details($1, $2, $3, $4)', [order_id, pizza_details_id, quantity, product_id]);
@@ -154,9 +162,17 @@ class DatabaseApi {
         }
     }
 
-    async deleteAddress(addressID) {
+    async deleteAddress(address_id) {
         try {
-            await this.pool.query('SELECT delete_address($1)', [addressID]);
+            await this.pool.query('SELECT delete_address($1)', [address_id]);
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    async deletePizza(pizza_id) {
+        try {
+            await this.pool.query('SELECT delete_pizza($1)', [pizza_id]);
         } catch (e) {
             throw e;
         }

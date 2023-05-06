@@ -152,6 +152,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/* add_pizza */
+CREATE OR REPLACE FUNCTION add_pizza(n_name text, n_description text, n_price numeric(8, 2), n_image text)
+    RETURNS void AS $$
+BEGIN
+    INSERT INTO Pizzas(name, description, price, image) VALUES (n_name, n_description, n_price, n_image);
+END;
+$$ LANGUAGE plpgsql;
+
 /* get_user_by_username_and_password */
 CREATE OR REPLACE FUNCTION get_user_by_username_and_password(name_in text, password_in text)
     RETURNS json
@@ -242,6 +250,14 @@ CREATE OR REPLACE FUNCTION delete_address(address_id integer)
     RETURNS void AS $$
 BEGIN
     DELETE FROM DeliveryAddresses WHERE id = address_id;
+END;
+$$ LANGUAGE plpgsql;
+
+/* delete_address */
+CREATE OR REPLACE FUNCTION delete_pizza(pizza_id integer)
+    RETURNS void AS $$
+BEGIN
+    DELETE FROM Pizzas WHERE id = pizza_id;
 END;
 $$ LANGUAGE plpgsql;
 

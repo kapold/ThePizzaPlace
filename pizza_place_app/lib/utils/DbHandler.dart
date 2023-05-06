@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:pizza_place_app/models/Address.dart';
@@ -10,7 +13,9 @@ import '../models/Pizza.dart';
 import '../models/User.dart';
 
 class DbHandler {
-  static String baseUri = "http://10.0.2.2:3000";
+  static String baseUri = kIsWeb ? "http://localhost:3000" : "http://10.0.2.2:3000";
+  //static String baseUri = "http://localhost:3000";
+  //static String baseUri = "http://10.0.2.2:3000";
 
   static Future<List<User>> fetchUsers() async {
     final response = await http.get(Uri.parse(baseUri + '/users'));
@@ -72,6 +77,25 @@ class DbHandler {
     List<dynamic> parsedJson = jsonDecode(response.body);
     int createOrder = parsedJson[0]["create_order"];
     return createOrder;
+  }
+
+  static Future<void> addPizza(Pizza pizza, BuildContext context) async {
+    final url = Uri.parse(baseUri + '/pizzas');
+    final headers = { 'Content-Type': 'application/json' };
+    final body = json.encode({
+      'name': pizza.name,
+      'description': pizza.description,
+      'price': pizza.price,
+      'image': pizza.image
+    });
+
+    try {
+      final response = await http.post(url, headers: headers, body: body);
+      print("Pizza add: ${response.statusCode}");
+    }
+    catch (e) {
+      print(e);
+    }
   }
 
   static Future<void> addOrderDetails(int order_id, int pizza_details_id, int quantity, int product_id, BuildContext context) async {
@@ -228,12 +252,22 @@ class DbHandler {
     return true;
   }
 
-  static Future<void> deleteUserAddress(int addressID) async {
-    var url = Uri.parse(baseUri + '/addresses/${addressID.toString()}');
+  static Future<void> deleteUserAddress(int address_id) async {
+    var url = Uri.parse(baseUri + '/addresses/${address_id.toString()}');
 
     var response = await http.delete(url);
     if (response.statusCode != 200 && response.statusCode != 201)
       throw Exception('Failed to delete Address');
+  }
+
+  static Future<void> deletePizza(int pizza_id) async {
+    var url = Uri.parse(baseUri + '/pizzas/${pizza_id.toString()}');
+
+    var response = await http.delete(url);
+    print("Pizza to delete: ${pizza_id}");
+    print("Response code: ${response.statusCode}");
+    if (response.statusCode != 200 && response.statusCode != 201)
+      throw Exception('Failed to delete Pizza');
   }
 
   static Future<List<PizzaDetails>> getPizzaDetails() async {

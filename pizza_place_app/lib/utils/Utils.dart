@@ -3,11 +3,15 @@ import 'package:pizza_place_app/utils/AppColor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/Address.dart';
+import '../models/Order.dart';
+import '../models/Pizza.dart';
 import '../models/User.dart';
 
 class Utils {
   static User? currentUser = null;
   static late List<Address> userAddresses;
+  static late List<Pizza> pizzas;
+  static late List<Order> history;
 
   static AlertDialog showAlertDialog(BuildContext context, String message) {
     Widget okButton = TextButton(
@@ -40,10 +44,11 @@ class Utils {
       print(item.toString());
   }
 
-  static Future<bool> saveUserInSP(String username, String password) async {
+  static Future<bool> saveUserInSP(String username, String password, int role) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('username', username);
     await prefs.setString('password', password);
+    await prefs.setInt('role', role);
     return true;
   }
 
@@ -55,5 +60,10 @@ class Utils {
   static Future<String?> getPasswordFromSP() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('password');
+  }
+
+  static Future<int?> getRoleFromSP() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('role');
   }
 }

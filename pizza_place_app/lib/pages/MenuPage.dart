@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pizza_place_app/utils/AppColor.dart';
@@ -25,7 +26,9 @@ class _MenuPageState extends State<MenuPage> {
     super.initState();
     _timeString = _formatDateTime(DateTime.now());
     _timer = Timer.periodic(Duration(seconds: 1), (Timer t) => _getCurrentTime());
-    initLocalDB();
+    if (!kIsWeb) {
+      initLocalDB();
+    }
   }
 
   void initLocalDB() async {

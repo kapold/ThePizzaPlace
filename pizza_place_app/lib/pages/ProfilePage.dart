@@ -87,7 +87,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       TextButton(
                           onPressed: () {
                             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AuthPage()));
-                            Utils.saveUserInSP("", "");
+                            Utils.saveUserInSP("", "", 0);
                           },
                           child: Text(
                             'Выйти',
@@ -206,6 +206,28 @@ class _ProfilePageState extends State<ProfilePage> {
                                   side: BorderSide(color: AppColor.pumpkin)
                               ),
                               padding: EdgeInsets.only(top: 14, bottom: 14, right: 60, left: 60)
+                          )
+                      ),
+                      SizedBox(height: 20),
+                      TextButton(
+                          onPressed: () async {
+                            // TODO: history
+                            Utils.history = [];
+                            Navigator.pushNamed(context, '/history');
+                          },
+                          child: Text(
+                            'История заказов',
+                            style: TextStyle(
+                                color: AppColor.pumpkin,
+                                fontSize: 18
+                            ),
+                          ),
+                          style: TextButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50.0),
+                                  side: BorderSide(color: AppColor.pumpkin)
+                              ),
+                              padding: EdgeInsets.only(top: 14, bottom: 14, right: 58, left: 58)
                           )
                       )
                     ]

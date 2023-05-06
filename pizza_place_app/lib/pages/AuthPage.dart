@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_place_app/pages/AdminPage.dart';
+import 'package:pizza_place_app/pages/DeliveryManPage.dart';
 import 'package:pizza_place_app/pages/MainPage.dart';
 import 'package:pizza_place_app/utils/DbHandler.dart';
 import 'package:pizza_place_app/utils/Utils.dart';
@@ -85,11 +87,22 @@ class _AuthPageState extends State<AuthPage> {
                           User? userData = await user;
 
                           if (userData != null) {
-                            //Utils.showAlertDialog(context, userData.toString());
-                            Future<bool> result = Utils.saveUserInSP(username, password);
+                            Future<bool> result = Utils.saveUserInSP(username, password, userData.role_id!);
                             bool saved = await result;
-                            if (saved)
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));
+                            if (saved) {
+                              if (userData.role_id == 1) {
+                                print("Role -> CUSTOMER");
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));
+                              }
+                              else if (userData.role_id == 2) {
+                                print("Role -> ADMIN");
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AdminPage()));
+                              }
+                              else if (userData.role_id == 3) {
+                                print("Role -> DELIVERYMAN");
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => DeliveryManPage()));
+                              }
+                            }
                           }
                         },
                         child: Text(

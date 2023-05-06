@@ -27,7 +27,10 @@ class _CartPageState extends State<CartPage> {
   void initState() {
     super.initState();
     _showCart();
-    _selectedItem = Utils.userAddresses[0].address!;
+    if (Utils.userAddresses.isNotEmpty)
+      _selectedItem = Utils.userAddresses[0].address!;
+    else
+      _selectedItem = "";
   }
 
   Future<void> _showCart() async {

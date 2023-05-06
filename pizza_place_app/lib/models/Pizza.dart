@@ -6,11 +6,11 @@ class Pizza {
   String? image;
 
   Pizza({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.price,
-    required this.image
+    this.id,
+    this.name,
+    this.description,
+    this.price,
+    this.image
   });
 
   factory Pizza.fromJson(Map<String, dynamic> json) {

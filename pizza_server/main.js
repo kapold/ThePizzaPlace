@@ -149,6 +149,17 @@ app.post('/orders', async (req, res) => {
     }
 });
 
+app.post('/pizzas', async (req, res) => {
+    const { name, description, price, image } = req.body;
+    try {
+        await db.addPizza(name, description, price, image);
+        res.status(200).json("OK");
+    }
+    catch (e) {
+        res.status(200).json({message: e});
+    }
+});
+
 app.post('/order_details', async (req, res) => {
     const { order_id, pizza_details_id, quantity, product_id } = req.body;
 
@@ -182,10 +193,22 @@ app.put('/users', async (req, res) => {
 
 /* DELETE */
 app.delete('/addresses/:id', async (req, res) => {
-    const addressID = req.params.id;
-    console.log("Address id: " + addressID);
+    const address_id = req.params.id;
+    console.log("Address id: " + address_id);
     try {
-        await db.deleteAddress(addressID);
+        await db.deleteAddress(address_id);
+        res.sendStatus(201);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
+});
+
+app.delete('/pizzas/:id', async (req, res) => {
+    const pizza_id = req.params.id;
+    console.log("Pizza id: " + pizza_id);
+    try {
+        await db.deletePizza(pizza_id);
         res.sendStatus(201);
     } catch (e) {
         console.error(e);

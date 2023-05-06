@@ -26,6 +26,7 @@ class _ListViewMenuState extends State<ListViewMenu> {
   Future<void> _fetchPizzas() async {
     try {
       pizzas = await DbHandler.fetchPizzas();
+      Utils.pizzas = pizzas;
     } catch (e) {
       print(e);
     } finally {
