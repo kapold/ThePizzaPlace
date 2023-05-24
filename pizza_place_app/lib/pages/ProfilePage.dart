@@ -80,7 +80,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       Text(
                         'Добрый день!',
                         style: TextStyle(
-                            fontSize: 26,
+                            fontSize: 22,
                             fontWeight: FontWeight.bold
                         ),
                       ),
@@ -101,13 +101,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                   borderRadius: BorderRadius.circular(50.0),
                                   side: BorderSide(color: AppColor.pumpkin)
                               ),
-                              padding: EdgeInsets.only(top: 14, bottom: 14, right: 40, left: 40)
+                              padding: EdgeInsets.only(top: 10, bottom: 10, right: 20, left: 20)
                           )
                       )
                     ]
                 ),
               ),
-              SizedBox(height: 32),
               Container(
                 padding: EdgeInsets.only(left: 32, right: 32, top: 16, bottom: 16),
                 child: Column(

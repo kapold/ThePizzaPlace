@@ -3,6 +3,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 import '../models/CartItem.dart';
+import '../models/Order.dart';
+import '../models/OrderItem.dart';
 import '../models/Pizza.dart';
 
 class SQLiteHandler {
@@ -45,6 +47,30 @@ class SQLiteHandler {
         '''
         );
         print("< Table 'Cart' created >");
+
+        db.execute('''
+          CREATE TABLE Orders (
+            id INTEGER PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            delivery_id INTEGER NOT NULL,
+            created_at TEXT NOT NULL,
+            status TEXT NOT NULL
+          );
+        '''
+        );
+        print("< Table 'Orders' created >");
+
+        db.execute('''
+          CREATE TABLE OrderItems (
+            id INTEGER PRIMARY KEY,
+            order_id INTEGER NOT NULL,
+            product_id INTEGER NOT NULL,
+            pizza_details_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL
+          );
+        '''
+        );
+        print("< Table 'OrderItems' created >");
       },
     );
     _database = database;
@@ -55,6 +81,86 @@ class SQLiteHandler {
     final db = await database;
     await db.delete('Cart');
     await db.delete('Pizzas');
+  }
+
+  Future<void> clearHistory() async {
+    final db = await database;
+    db.delete('Orders');
+    db.delete('OrderItems');
+  }
+
+  Future<List<Order>> getOrders(int? user_id) async {
+    try {
+      final Database db = await database;
+      final List<Map<String, dynamic>> results = await db.rawQuery('''
+        SELECT * FROM Orders WHERE user_id = ${user_id}
+      ''');
+      final List<Order> orders = [];
+      for (final row in results) {
+        final order = Order(
+          id: row['id'],
+          user_id: row['user_id'],
+          delivery_id: row['delivery_id'],
+          created_at: row['created_at'],
+          status: row['status']
+        );
+        orders.add(order);
+      }
+      return orders;
+    } catch (e) {
+      print('Error getting orders: $e');
+      return [];
+    }
+  }
+
+  Future<List<OrderItem>> getOrderItems() async {
+    try {
+      final Database db = await database;
+      final List<Map<String, dynamic>> results = await db.rawQuery('''
+        SELECT * FROM OrderItems
+      ''');
+      final List<OrderItem> orderItems = [];
+      for (final row in results) {
+        final orderItem = OrderItem(
+            id: row['id'],
+            order_id: row['order_id'],
+            product_id: row['product_id'],
+            pizza_details_id: row['pizza_details_id'],
+            quantity: row['quantity']
+        );
+        orderItems.add(orderItem);
+      }
+      return orderItems;
+    } catch (e) {
+      print('Error getting order items: $e');
+      return [];
+    }
+  }
+
+  Future<void> addOrder(Order order) async {
+    final db = await database;
+    try {
+      await db.rawInsert(
+          'INSERT INTO Orders(id, user_id, delivery_id, created_at, status) '
+              'VALUES(?, ?, ?, ?, ?)',
+          [order.id, order.user_id, order.delivery_id, order.created_at, order.status]);
+    }
+    catch (e) {
+      print('Error inserting order: $e');
+    }
+  }
+
+  Future<void> addOrderItem(OrderItem item) async {
+    final db = await database;
+    try {
+      await db.rawInsert(
+          'INSERT INTO OrderItems(id, order_id, product_id, pizza_details_id, quantity) '
+              'VALUES(?, ?, ?, ?, ?)',
+          [item.id, item.order_id, item.product_id, item.pizza_details_id, item.quantity]);
+    }
+    catch (e) {
+      print('Error inserting order item: $e');
+    }
   }
 
   Future<void> addPizza(CartItem item) async {

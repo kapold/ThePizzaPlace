@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_place_app/utils/SQLiteHandler.dart';
 
 import '../models/Order.dart';
 import '../models/OrderItem.dart';
 import '../utils/AppColor.dart';
-import '../utils/DbHandler.dart';
 import '../utils/Utils.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -15,6 +15,7 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   List<Order> orders = [];
+  List<OrderItem> orderItems = [];
   bool areThereOrders = false;
 
   @override
@@ -24,10 +25,20 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   void _getOrders() async {
-    orders = await DbHandler.getUserOrders(Utils.currentUser?.id, "done", context);
+    orders = await SQLiteHandler().getOrders(Utils.currentUser?.id);
+    orderItems = await SQLiteHandler().getOrderItems();
+    print("Orders Count: ${orders.length}");
+    print("OrderItems Count: ${orderItems.length}");
     if (orders.isNotEmpty) {
       for(Order order in orders)
-        order.items = await DbHandler.getOrderItems(order.id, context);
+        order.items = [];
+      for(Order order in orders) {
+        for(OrderItem item in orderItems) {
+          if (order.user_id == Utils.currentUser?.id)
+            if (order.id == item.order_id)
+              order.items?.add(item);
+        }
+      }
       areThereOrders = true;
     }
     setState(() {});

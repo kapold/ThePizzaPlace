@@ -39,7 +39,7 @@ class _AuthPageState extends State<AuthPage> {
     return Scaffold(
         body: SingleChildScrollView(
           child: Container(
-              padding: EdgeInsets.only(left: 32, right: 32, top: 200, bottom: 16),
+              padding: EdgeInsets.only(left: 32, right: 32, top: 100, bottom: 16),
               child: Column(
                   children: [
                     Text(
@@ -114,7 +114,7 @@ class _AuthPageState extends State<AuthPage> {
                         ),
                         style: TextButton.styleFrom(
                             backgroundColor: AppColor.pumpkin,
-                            padding: EdgeInsets.only(top: 20, bottom: 20, right: 128, left: 128)
+                            padding: EdgeInsets.only(top: 20, bottom: 20, right: 100, left: 100)
                         )
                     ),
                     SizedBox(height: 16),

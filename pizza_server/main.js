@@ -66,6 +66,17 @@ app.get('/orders', async (req, res) => {
     }
 });
 
+app.get('/all_orders', async (req, res) => {
+    const { status } = req.query;
+    try {
+        const rows = await db.getOrders(status);
+        res.send(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching all orders');
+    }
+});
+
 app.get('/order_details', async (req, res) => {
     const { order_id } = req.query;
     try {
@@ -74,6 +85,16 @@ app.get('/order_details', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Error fetching order items');
+    }
+});
+
+app.get('/all_order_details', async (req, res) => {
+    try {
+        const rows = await db.getAllOrderItems();
+        res.send(rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error fetching ALL order items');
     }
 });
 
@@ -188,6 +209,24 @@ app.put('/users', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Error updating user');
+    }
+});
+
+app.put('/orders', async (req, res) => {
+    try {
+        const {order_id, status} = req.body;
+        const result = await db.updateOrderStatus(order_id, status);
+
+        if (result) {
+            res.status(201);
+            console.log('Status updated 201')
+        } else {
+            res.status(500);
+            console.log('Error updating status 500')
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error updating status');
     }
 });
 

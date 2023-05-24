@@ -1,9 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pizza_place_app/utils/AppColor.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/Address.dart';
 import '../models/Order.dart';
+import '../models/OrderItem.dart';
 import '../models/Pizza.dart';
 import '../models/User.dart';
 
@@ -12,31 +14,33 @@ class Utils {
   static late List<Address> userAddresses;
   static late List<Pizza> pizzas;
   static late List<Order> history;
+  static late List<OrderItem> historyItems;
 
-  static AlertDialog showAlertDialog(BuildContext context, String message) {
-    Widget okButton = TextButton(
+  static CupertinoAlertDialog showAlertDialog(BuildContext context, String message) {
+    Widget okButton = CupertinoDialogAction(
       child: Text("OK", style: TextStyle(color: AppColor.pumpkin)),
       onPressed: () {
         Navigator.pop(context);
       },
     );
 
-    AlertDialog alert = AlertDialog(
+    CupertinoAlertDialog alert = CupertinoAlertDialog(
       title: Text("Внимание"),
       content: Text(message, style: TextStyle(fontSize: 16)),
       actions: [
         okButton,
-      ]
+      ],
     );
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      }
+    showCupertinoDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        }
     );
     return alert;
   }
+
 
   static void showListInfo(List list) {
     print("<----- List info ----->");

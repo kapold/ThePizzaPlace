@@ -69,18 +69,31 @@ class _PizzaPageState extends State<PizzaPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            child:  Image(
-              fit: BoxFit.cover,
-              image: AssetImage('assets/icons/burger_pi.png'),
-            ),
-            padding: EdgeInsets.only(right: 100, left: 100)
-          ),
           Expanded(
             child: SingleChildScrollView(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      Container(
+                          child:  Image.network(
+                            currentPizza.image!,
+                            fit: BoxFit.fill,
+                            loadingBuilder: (BuildContext context, Widget child,
+                                ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  color: AppColor.pumpkin,
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              );
+                            },
+                          ),
+                          padding: EdgeInsets.only(right: 100, left: 100)
+                      ),
                       Container(
                         padding: EdgeInsets.all(16),
                         child: Column(

@@ -118,7 +118,14 @@ BEGIN
     RETURN QUERY SELECT * FROM Orders WHERE Orders.user_id = $1 AND Orders.status = $2;
 END;
 $$ LANGUAGE plpgsql;
-SELECT * FROM get_user_orders(2, 'in progress');
+
+/* get_orders */
+CREATE FUNCTION get_orders(status TEXT)
+    RETURNS SETOF Orders AS $$
+BEGIN
+    RETURN QUERY SELECT * FROM Orders WHERE Orders.status = $1;
+END;
+$$ LANGUAGE plpgsql;
 
 /* get_order_items */
 CREATE FUNCTION get_order_items(order_id INTEGER)
@@ -128,6 +135,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 SELECT * FROM get_order_items(18);
+
+/* get_order_items */
+CREATE FUNCTION get_all_order_items()
+    RETURNS SETOF OrderDetails AS $$
+BEGIN
+    RETURN QUERY SELECT * FROM OrderDetails;
+END;
+$$ LANGUAGE plpgsql;
 
 /* add_user */
 CREATE OR REPLACE PROCEDURE add_user(
@@ -219,6 +234,16 @@ UPDATE users SET
                  phone_number = new_phone_number,
                  birthday = new_birthday
 WHERE id = user_id;
+END;
+$$ LANGUAGE plpgsql;
+
+/* update_order_status */
+CREATE OR REPLACE FUNCTION update_order_status(
+    n_order_id INTEGER,
+    n_status VARCHAR
+) RETURNS VOID AS $$
+BEGIN
+    UPDATE Orders SET status = n_status WHERE id = n_order_id;
 END;
 $$ LANGUAGE plpgsql;
 

@@ -1,15 +1,13 @@
-import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_network/image_network.dart';
 import 'package:pizza_place_app/utils/DbHandler.dart';
 
 import '../models/Pizza.dart';
 import '../utils/AppColor.dart';
 import '../utils/Utils.dart';
-import '../widgets/ImageContainer.dart';
 
 class AddPizzaPage extends StatefulWidget {
   const AddPizzaPage({Key? key}) : super(key: key);
@@ -22,12 +20,12 @@ class _AddPizzaPageState extends State<AddPizzaPage> {
   final nameCtrl = TextEditingController();
   final descriptionCtrl = TextEditingController();
   final priceCtrl = TextEditingController();
+  final imageCtrl = TextEditingController();
   bool isLoading = false;
-  String name = "", description = "", price = "";
-  File? image;
+  String name = "", description = "", price = "", image = "";
   final storageRef = FirebaseStorage.instance.ref();
   PlatformFile? file;
-  String? imageUrl;
+  FirebaseStorage storage = FirebaseStorage.instance;
 
   @override
   void initState() {
@@ -35,15 +33,18 @@ class _AddPizzaPageState extends State<AddPizzaPage> {
     nameCtrl.addListener(updateTextValue);
     descriptionCtrl.addListener(updateTextValue);
     priceCtrl.addListener(updateTextValue);
-
+    imageCtrl.addListener(updateTextValue);
   }
 
-  void updateTextValue() {
-    setState(() {
-      name = nameCtrl.text;
-      description = descriptionCtrl.text;
-      price = priceCtrl.text;
-    });
+  Future<void> _uploadImage() async {
+    try {
+      var ref = storageRef.child("images/${DateTime.now()}.jpg");
+      var fileBytes = file?.bytes;
+      ref.putData(fileBytes!);
+    }
+    on FirebaseException catch (e) {
+      print(e.message);
+    }
   }
 
   Future pickImage() async {
@@ -54,29 +55,18 @@ class _AddPizzaPageState extends State<AddPizzaPage> {
     }
   }
 
+  void updateTextValue() {
+    setState(() {
+      name = nameCtrl.text;
+      description = descriptionCtrl.text;
+      price = priceCtrl.text;
+    });
+  }
+
   bool _isValidInfo() {
     if (name.isEmpty || description.isEmpty || price.isEmpty)
       return false;
     return true;
-  }
-
-  Future<void> _uploadImage() async {
-    try {
-      var ref = storageRef.child("images/${DateTime.now()}.jpg");
-      var fileBytes = file?.bytes;
-      ref.putData(fileBytes!);
-
-    } on FirebaseException catch (e) {
-      print(e.message);
-    }
-  }
-
-  Future<String> _getImageUrl() async {
-    String img = "";
-    FirebaseStorage.instance.ref().child("images/leonardo.jpeg").getDownloadURL().then((value){
-      img = value;
-    });
-    return img;
   }
 
   @override
@@ -138,30 +128,58 @@ class _AddPizzaPageState extends State<AddPizzaPage> {
                                 )
                             ),
                             SizedBox(height: 20),
-                            TextButton(
-                                onPressed: () async {
-                                  // pickImage();
-                                  // final task = FirebaseStorageWeb.instance.ref().child('path/to/image').putBlob(blob);
-                                },
-                                child: Text(
-                                  'Выбрать картинку',
-                                  style: TextStyle(
-                                      color: AppColor.pumpkin,
-                                      fontSize: 16
-                                  ),
-                                ),
-                                style: TextButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(50.0),
-                                        side: BorderSide(color: AppColor.pumpkin)
+                            TextField(
+                                controller: imageCtrl,
+                                decoration: InputDecoration(
+                                    border: const OutlineInputBorder(
+                                      borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                      borderSide: const BorderSide(color: Colors.grey),
                                     ),
-                                    padding: EdgeInsets.only(top: 20, bottom: 20, right: 100, left: 100)
+                                    prefixIcon: Container(
+                                        child: Icon(Icons.image),
+                                        padding: EdgeInsets.only(left: 16, right: 16)
+                                    ),
+                                    hintText: "Ссылка на картинку"
                                 )
                             ),
-                            SizedBox(height: 40),
-                            ImageContainer(
-                              imageLocator: "images/leonardo.jpeg"
-                            )
+
+                            // TextButton(
+                            //     onPressed: () async {
+                            //       pickImage();
+                            //     },
+                            //     child: Text(
+                            //       'Выбрать картинку',
+                            //       style: TextStyle(
+                            //           color: AppColor.pumpkin,
+                            //           fontSize: 16
+                            //       ),
+                            //     ),
+                            //     style: TextButton.styleFrom(
+                            //         shape: RoundedRectangleBorder(
+                            //             borderRadius: BorderRadius.circular(50.0),
+                            //             side: BorderSide(color: AppColor.pumpkin)
+                            //         ),
+                            //         padding: EdgeInsets.only(top: 20, bottom: 20, right: 100, left: 100)
+                            //     )
+                            // ),
+
+                            // Image.network(
+                            //   "https://dodopizza-a.akamaihd.net/static/Img/Products/f05b3d7ed33647a985d383d68a94bf09_366x366.webp",
+                            //   scale: 2,
+                            //   fit: BoxFit.fill,
+                            //   loadingBuilder: (BuildContext context, Widget child,
+                            //       ImageChunkEvent? loadingProgress) {
+                            //     if (loadingProgress == null) return child;
+                            //     return Center(
+                            //       child: CircularProgressIndicator(
+                            //         value: loadingProgress.expectedTotalBytes != null
+                            //             ? loadingProgress.cumulativeBytesLoaded /
+                            //             loadingProgress.expectedTotalBytes!
+                            //             : null,
+                            //       ),
+                            //     );
+                            //   },
+                            // )
                           ]
                       )
                   ),
@@ -178,7 +196,7 @@ class _AddPizzaPageState extends State<AddPizzaPage> {
                                 name: name,
                                 description: description,
                                 price: double.tryParse(price),
-                                image: "none"
+                                image: imageCtrl.text
                               ),
                               context
                             );
@@ -187,13 +205,16 @@ class _AddPizzaPageState extends State<AddPizzaPage> {
                               name = "";
                               description = "";
                               price = "";
+                              image = "";
                               nameCtrl.text = "";
                               descriptionCtrl.text = "";
                               priceCtrl.text = "";
+                              imageCtrl.text = "";
                             });
                           }
                           else {
                             Utils.showAlertDialog(context, "Проверьте валидность данных");
+                            setState(() { isLoading = false; });
                             return;
                           }
                           setState(() { isLoading = false; });

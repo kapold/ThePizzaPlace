@@ -53,16 +53,23 @@ class _ListViewMenuState extends State<ListViewMenu> {
       child: Row(
         children: [
           SizedBox(width: 16),
-          Container(
-            height: 120,
-            width: 120,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: AssetImage('assets/icons/burger_pi.png'),
-              ),
-            ),
+          Image.network(
+            pizza.image!,
+            scale: 3,
+            fit: BoxFit.fill,
+            loadingBuilder: (BuildContext context, Widget child,
+                ImageChunkEvent? loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Center(
+                child: CircularProgressIndicator(
+                  color: AppColor.pumpkin,
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              );
+            },
           ),
           SizedBox(width: 16),
           Expanded(

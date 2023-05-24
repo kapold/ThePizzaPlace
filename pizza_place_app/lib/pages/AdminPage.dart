@@ -46,7 +46,8 @@ class _AdminPageState extends State<AdminPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Admin Page")
+        title: Text("Админ-панель"),
+        centerTitle: true
       ),
       body: Column(
           children: [

@@ -114,6 +114,21 @@ class DatabaseApi {
         }
     }
 
+    async updateOrderStatus(order_id, status) {
+        try {
+            const queryText = 'SELECT update_order_status($1, $2)';
+            const values = [order_id, status];
+            await this.pool.query(queryText, values);
+
+            console.log('Successfully updated status');
+            return true;
+        } catch (e) {
+            console.error('Error updating status', e);
+            await this.pool.query('ROLLBACK');
+            return false;
+        }
+    }
+
     async getUserByUsernameAndPassword(username, password) {
         const query = {
             text: 'SELECT get_user_by_username_and_password($1, $2)',
@@ -152,6 +167,16 @@ class DatabaseApi {
         }
     }
 
+    async getOrders(status) {
+        try {
+            const { rows } = await this.pool.query('SELECT * FROM get_orders($1)', [status]);
+            return rows;
+        } catch (error) {
+            console.error(error);
+            throw new Error('Error fetching all orders');
+        }
+    }
+
     async getOrderItems(order_id) {
         try {
             const { rows } = await this.pool.query('SELECT * FROM get_order_items($1)', [order_id]);
@@ -159,6 +184,16 @@ class DatabaseApi {
         } catch (error) {
             console.error(error);
             throw new Error('Error fetching order items');
+        }
+    }
+
+    async getAllOrderItems() {
+        try {
+            const { rows } = await this.pool.query('SELECT * FROM get_all_order_items()');
+            return rows;
+        } catch (error) {
+            console.error(error);
+            throw new Error('Error fetching ALL order items');
         }
     }
 

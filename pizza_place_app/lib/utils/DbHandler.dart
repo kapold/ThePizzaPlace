@@ -14,8 +14,9 @@ import '../models/User.dart';
 
 class DbHandler {
   static String baseUri = kIsWeb ? "http://localhost:3000" : "http://10.0.2.2:3000";
-  //static String baseUri = "http://localhost:3000";
-  //static String baseUri = "http://10.0.2.2:3000";
+  //static String baseUri = "http://172.20.10.2:3000"; ROMAS 192.168.1.94
+  //static String baseUri = "http://localhost:3000"; LOCALS
+  //static String baseUri = "http://10.0.2.2:3000"; local_mb
 
   static Future<List<User>> fetchUsers() async {
     final response = await http.get(Uri.parse(baseUri + '/users'));
@@ -181,6 +182,23 @@ class DbHandler {
     return true;
   }
 
+  static Future<bool> updateOrderStatus(int order_id, String status) async {
+    final url = Uri.parse(baseUri + '/orders');
+    final headers = { 'Content-Type': 'application/json' };
+    final body = json.encode({
+      'order_id': order_id,
+      'status': status
+    });
+
+    final response = await http.put(url, headers: headers, body: body);
+    if (response.statusCode != 201) {
+      if (response.statusCode == 500) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   static Future<List<Address>> getUserAddresses(int? user_id, BuildContext context) async {
     final response = await http.get(Uri.parse(baseUri + '/addresses/$user_id'));
 
@@ -214,6 +232,26 @@ class DbHandler {
     }
   }
 
+  static Future<List<Order>> getOrders(String status, BuildContext context) async {
+    final url = Uri.parse(baseUri + '/all_orders?status=$status');
+    final headers = { 'Content-Type': 'application/json' };
+
+    try {
+      final response = await http.get(url, headers: headers);
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        List<Map<String, dynamic>> data = List<Map<String, dynamic>>.from(jsonResponse);
+        List<Order> orders = data.map((json) => Order.fromJson(json)).toList();
+        return orders;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      Utils.showAlertDialog(context, "Список всех заказов пуст");
+      return [];
+    }
+  }
+
   static Future<List<OrderItem>> getOrderItems(int? order_id, BuildContext context) async {
     final url = Uri.parse(baseUri + '/order_details?order_id=$order_id');
     final headers = { 'Content-Type': 'application/json' };
@@ -230,6 +268,26 @@ class DbHandler {
       }
     } catch (e) {
       Utils.showAlertDialog(context, "Ошибка получения информации о заказе");
+      return [];
+    }
+  }
+
+  static Future<List<OrderItem>> getAllOrderItems(BuildContext context) async {
+    final url = Uri.parse(baseUri + '/all_order_details');
+    final headers = { 'Content-Type': 'application/json' };
+
+    try {
+      final response = await http.get(url, headers: headers);
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        List<Map<String, dynamic>> data = List<Map<String, dynamic>>.from(jsonResponse);
+        List<OrderItem> orderItems = data.map((json) => OrderItem.fromJson(json)).toList();
+        return orderItems;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      Utils.showAlertDialog(context, "Ошибка получения информации о заказе(all)");
       return [];
     }
   }
@@ -282,10 +340,4 @@ class DbHandler {
       return [];
     }
   }
-
-  // static Future<List<Order>> getUserOrders(int user_id) async {
-  //   final response = await http.get(Uri.parse(baseUri + '/user_orders'));
-  //
-  //
-  // }
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pizza_place_app/pages/AuthPage.dart';
+import 'package:pizza_place_app/widgets/OrdersListView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../utils/AppColor.dart';
 import '../utils/DbHandler.dart';
 import '../utils/Utils.dart';
 
@@ -12,6 +15,8 @@ class DeliveryManPage extends StatefulWidget {
 }
 
 class _DeliveryManPageState extends State<DeliveryManPage> {
+  bool isShowable = true;
+
   @override
   void initState() {
     super.initState();
@@ -42,14 +47,30 @@ class _DeliveryManPageState extends State<DeliveryManPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: Text("${Utils.currentUser?.username}")
+            title: Text("Доставка"),
+            centerTitle: true
         ),
         body: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.all(32),
-              child: Text("dfgd")
-            )
+            Expanded(
+              child: isShowable ? OrdersListView() : OrdersListView()
+            ),
+            Divider(color: Colors.black),
+            SizedBox(height: 10),
+            Center(
+                child: TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AuthPage()));
+                      Utils.saveUserInSP("", "", 0);
+                    },
+                    child: Text("Выйти", style: TextStyle(color: Colors.white, fontSize: 20)),
+                    style: TextButton.styleFrom(
+                        backgroundColor: AppColor.pumpkin,
+                        padding: EdgeInsets.only(top: 14, bottom: 14, right: 110, left: 110)
+                    )
+                )
+            ),
+            SizedBox(height: 20)
           ]
         )
     );
